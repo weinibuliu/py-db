@@ -22,7 +22,7 @@
 pip install -e py-db
 
 # 在子项目中
-pip install -e ./py-db
+pip install -e ../py-db
 
 # 或者使用绝对路径
 pip install -e /path/to/py-db
@@ -33,7 +33,7 @@ pip install -e /path/to/py-db
 ```bash
 # requirements.txt (使用相对于 requirements.txt 文件所在的相对目录)
 # ...
--e ./py-db
+-e ../py-db
 
 # bash
 pip install -r requirements.txt
