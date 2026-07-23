@@ -3,15 +3,7 @@ from typing import Optional
 
 from sqlmodel import Field, Integer
 
-from .common import MyBaseModel
-
-
-class ClassStatus(IntEnum):
-    OK = 0
-    Created = 1
-    Ended = 2
-
-    Deleted = 100  # 逻辑删除
+from .define import MyBaseModel, ClassStatus
 
 
 class BaseClass(MyBaseModel):

@@ -17,6 +17,29 @@ class Gender(IntEnum):
     Female = 1
 
 
+class UserStatus(IntEnum):
+    OK = 0
+    Banned = 1  # 禁用 | reason 字段中说明原因
+
+    Deleted = 100  # 逻辑删除
+
+
+class ClassStatus(IntEnum):
+    OK = 0
+    Created = 1
+    Ended = 2
+
+    Deleted = 100  # 逻辑删除
+
+
+class ClassRecordStatus(IntEnum):
+    OK = 0
+
+    Deleted = 100  # 逻辑删除
+
+
+
+
 class MyBaseModel(SQLModel):
     id: int = Field(default=None, primary_key=True)
 

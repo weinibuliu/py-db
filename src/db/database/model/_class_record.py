@@ -1,15 +1,9 @@
 from enum import IntEnum
 from typing import Optional
 
-from sqlmodel import Field, SQLModel, Integer
+from sqlmodel import Field, Integer
 
-from .common import MyBaseModel, Role
-
-
-class ClassRecordStatus(IntEnum):
-    OK = 0
-
-    Deleted = 100  # 逻辑删除
+from .define import MyBaseModel, Role, ClassRecordStatus
 
 
 class BaseClassRecord(MyBaseModel):

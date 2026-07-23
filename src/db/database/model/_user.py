@@ -4,14 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 from sqlmodel import Field, Integer, SQLModel
 
-from .common import Role, Gender, MyBaseModel
-
-
-class UserStatus(IntEnum):
-    OK = 0
-    Banned = 1  # 禁用 | reason 字段中说明原因
-
-    Deleted = 100  # 逻辑删除
+from .define import Role, Gender, MyBaseModel, UserStatus
 
 
 class BaseUser(MyBaseModel):
