@@ -1,0 +1,12 @@
+[project]
+name = "db"
+version = "0.0.1"
+dependencies = [
+    "sqlmodel==0.0.38",
+    "python-dotenv==1.2.2",
+    "pymysql==1.2.0",
+]
+description = "The internal Database ORM powered by SQLModel"
+
+[tool.setuptools.packages.find]
+where = ["src"]

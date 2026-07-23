@@ -1,0 +1,13 @@
+.venv
+*.pyc
+*.pyd
+__pycache__
+test.py
+
+CLAUDE.md
+.claude
+
+*-info
+.pytest_cache
+
+.env
