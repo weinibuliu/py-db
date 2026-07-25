@@ -8,7 +8,7 @@ U — Update  (update_user / update_class / update_class_record)
 未涉及 Delete，因为项目采用逻辑删除策略，不对外提供 DELETE 接口。
 """
 
-from src.db.database import (
+from src.db._db import (
     db,
     # Create
     create_user,
@@ -39,8 +39,8 @@ from src.db.database import (
     ClassStatus,
     ClassRecordStatus,
 )
-from src.db.database.crud.create import CreateStatus
-from src.db.database.crud.update import UpdateStatus
+from src.db._db.crud.create import CreateStatus
+from src.db._db.crud.update import UpdateStatus
 
 # ============================================================
 #  User (user_rft)  —  CRU

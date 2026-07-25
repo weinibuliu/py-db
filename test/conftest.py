@@ -6,7 +6,7 @@
 import pytest
 from sqlmodel import SQLModel, create_engine
 
-from src.db.database.engine import DBEngine
+from src.db._db.engine import DBEngine
 
 
 @pytest.fixture(autouse=True)
