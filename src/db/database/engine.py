@@ -1,36 +1,25 @@
-import os
 from contextlib import contextmanager
-from pathlib import Path
 from typing import Generator, Optional
 
-import dotenv
 import sqlmodel as sql
 from sqlalchemy import Engine
 
-# load env from ./.env
-ENV_FILE_PATH = Path.cwd() / ".env"
-
-dotenv.load_dotenv(ENV_FILE_PATH)
-db_host: Optional[str] = os.getenv("DB_HOST")
-db_port: Optional[str] = os.getenv("DB_PORT")
-db_name: Optional[str] = os.getenv("DB_NAME")
-db_user: Optional[str] = os.getenv("DB_USER")
-password: Optional[str] = os.getenv("DB_PASSWORD")
+from ..common import DBConfig
 
 
 # 默认情况下 下游无需显式初始化数据库连接 而是在调用时自动懒加载
 # 但生产环境下 调用方可以考虑自行调用 `create_engine` 以提前初始化 db
 class DBEngine:
     _engine: Optional[Engine] = None
+    _cfg = DBConfig()
 
     @classmethod
     def create_engine(cls) -> None:
         if cls._engine is None:
             cls._engine = sql.create_engine(
-                url=f"mysql+pymysql://{db_user}:{password}@{db_host}:{db_port}/{db_name}",
+                url=cls._cfg.url,
                 pool_pre_ping=True,
                 pool_recycle=3600,
-                echo=True,  # for debug. if release, should close this.
             )
 
     @classmethod

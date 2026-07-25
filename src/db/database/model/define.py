@@ -21,7 +21,7 @@ class UserStatus(IntEnum):
     OK = 0
     Banned = 1  # 禁用 | reason 字段中说明原因
 
-    Deleted = 100  # 逻辑删除
+    Deleted = 100
 
 
 class ClassStatus(IntEnum):
@@ -29,13 +29,13 @@ class ClassStatus(IntEnum):
     Created = 1
     Ended = 2
 
-    Deleted = 100  # 逻辑删除
+    Deleted = 100
 
 
 class ClassRecordStatus(IntEnum):
     OK = 0
 
-    Deleted = 100  # 逻辑删除
+    Deleted = 100
 
 
 
