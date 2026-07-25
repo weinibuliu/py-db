@@ -5,6 +5,8 @@ dependencies = [
     "sqlmodel==0.0.38",
     "pymysql==1.2.0",
     "pydantic-settings==2.14.2",
+    "redis==8.0.1",
+    "hiredis==3.4.0",
 ]
 description = "The internal Database ORM powered by SQLModel"
 
