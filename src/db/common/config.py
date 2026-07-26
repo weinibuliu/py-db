@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 import dotenv
 from pydantic import Field
@@ -31,8 +32,8 @@ class DBConfig(BaseSettings):
 class RedisConfig(BaseSettings):
     host: str = Field(default=...)
     port: int = Field(default=...)
-    user: str = Field(default=...)
-    password: str = Field(default=...)
+    user: Optional[str] = Field(default=None)
+    password: Optional[str] = Field(default=None)
 
     model_config = {
         "env_prefix": "REDIS_",
