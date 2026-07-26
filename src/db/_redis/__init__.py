@@ -6,6 +6,7 @@ from .session import (
     verify_access,
     verify_refresh,
 )
+from .session.define import ACCESS_TTL, REFRESH_TTL
 
 __all__ = [
     "create_redis",
@@ -15,4 +16,6 @@ __all__ = [
     "refresh_session",
     "verify_access",
     "verify_refresh",
+    "ACCESS_TTL",
+    "REFRESH_TTL",
 ]
