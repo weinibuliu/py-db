@@ -6,15 +6,14 @@ from ..common import RedisConfig
 
 
 class RedisClient:
-    """Own one lazily-created Redis client and its connection pool."""
+    """Own the process-wide lazy Redis client and its connection pool."""
 
-    def __init__(self, config: Optional[RedisConfig] = None) -> None:
-        self._config = config
-        self._client: Optional[aioredis.Redis] = None
+    _client: Optional[aioredis.Redis] = None
 
-    def get(self) -> aioredis.Redis:
-        if self._client is None:
-            config = self._config or RedisConfig()
+    @classmethod
+    def create(cls) -> None:
+        if cls._client is None:
+            config = RedisConfig()
             pool = aioredis.ConnectionPool(
                 host=config.host,
                 port=config.port,
@@ -24,19 +23,30 @@ class RedisClient:
                 max_connections=10,
                 decode_responses=True,
             )
-            self._client = aioredis.Redis(
+            cls._client = aioredis.Redis(
                 connection_pool=pool,
                 protocol=2,
             )
 
-        return self._client
+    @classmethod
+    def get(cls) -> aioredis.Redis:
+        if cls._client is None:
+            cls.create()
 
-    async def close(self) -> None:
-        if self._client is None:
+        assert cls._client is not None
+        return cls._client
+
+    @classmethod
+    async def close(cls) -> None:
+        if cls._client is None:
             return
 
-        await self._client.aclose(close_connection_pool=True)
-        self._client = None
+        await cls._client.aclose(close_connection_pool=True)
+        cls._client = None
 
 
-__all__ = ["RedisClient"]
+create_redis = RedisClient.create
+close_redis = RedisClient.close
+
+
+__all__ = ["create_redis", "close_redis"]

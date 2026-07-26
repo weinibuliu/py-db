@@ -7,12 +7,13 @@ from pathlib import Path
 
 import pytest
 import pytest_asyncio
+import redis.asyncio as aioredis
 from dotenv import dotenv_values
 from sqlmodel import SQLModel, create_engine
 
 from src.db._db.engine import DBEngine
 from src.db.common import RedisConfig
-from src.db._redis import RedisClient, SessionStore
+from src.db._redis.client import RedisClient
 
 TEST_ENV_PATH = Path.cwd() / "test.env"
 
@@ -56,18 +57,28 @@ def setup_test_db(monkeypatch):
 
 
 @pytest_asyncio.fixture
-async def session_store():
+async def redis(monkeypatch):
     """连接专用测试 Redis，并在每条测试前后清空 DB 0。"""
-    redis_client = RedisClient(_redis_test_config())
-    client = redis_client.get()
+    config = _redis_test_config()
+    pool = aioredis.ConnectionPool(
+        host=config.host,
+        port=config.port,
+        username=config.user,
+        password=config.password,
+        db=0,
+        max_connections=10,
+        decode_responses=True,
+    )
+    client = aioredis.Redis(connection_pool=pool, protocol=2)
     ready = False
 
     try:
         await client.ping()
         await client.flushdb()
         ready = True
-        yield SessionStore(client)
+        monkeypatch.setattr(RedisClient, "_client", client)
+        yield
     finally:
         if ready:
             await client.flushdb()
-        await redis_client.close()
+        await RedisClient.close()

@@ -46,16 +46,32 @@ import db
 # ...
 ```
 
-Redis 连接生命周期与业务场景分别由不同模块负责：
+Redis 与 SQL 数据库采用相同的模块级调用方式。FastAPI lifespan 只负责连接生命周期：
 
 ```python
-from db import RedisClient, SessionStore
+from contextlib import asynccontextmanager
 
-redis_client = RedisClient()
-sessions = SessionStore(redis_client.get())
+from fastapi import FastAPI
 
-await sessions.create(uid, access_token, refresh_token)
-owner_uid = await sessions.verify_access(access_token)
+from db import close_redis, create_redis, create_session
 
-await redis_client.close()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_redis()
+    try:
+        yield
+    finally:
+        await close_redis()
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+async def login():
+    await create_session(
+        uid,
+        access_token,
+        refresh_token,
+    )
 ```

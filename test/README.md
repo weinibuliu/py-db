@@ -9,5 +9,5 @@ python -m pytest test/ -v
 
 Redis 测试会读取当前工作路径下的 `test.env`：
 
-`session_store` fixture 会在每条测试前后执行 `FLUSHDB`。必须使用专用测试
+`redis` fixture 会在每条测试前后执行 `FLUSHDB`。必须使用专用测试
 Redis 实例，不能填写开发或生产 Redis 配置。
