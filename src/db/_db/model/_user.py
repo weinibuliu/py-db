@@ -69,14 +69,12 @@ class UserPublic(SQLModel, table=False):
 
 # dto
 class CreateUser(BaseModel):
-    model_config = {"strict": True}
-
     uid: str = Field(..., min_length=10, max_length=10, description="uid")
     password: str = Field(..., min_length=8, max_length=18, description="password")
     name: str = Field(..., min_length=2, description="name")
     role: Role = Field(default=Role.Student)
-    gender: Gender
-    college: str
+    gender: Gender = Field(...)
+    college: str = Field(...)
 
     # only for status
     grade: Optional[str] = Field(default=None)

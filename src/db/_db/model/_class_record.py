@@ -31,8 +31,6 @@ class UpdateClassRecord(MyBaseModel):
 
 # dto
 class CreateClassRecord(BaseModel):
-    model_config = {"strict": True}
-
     uid: str = Field(..., min_length=10, max_length=10, description="uid")
     role: Role = Field(...)
     class_id: int = Field(...)

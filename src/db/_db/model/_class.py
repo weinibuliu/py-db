@@ -27,8 +27,6 @@ class UpdateClass(MyBaseModel):
 
 # dto
 class CreateClass(BaseModel):
-    model_config = {"strict": True}
-
     name: str = Field(...)
     course: Optional[str] = Field(default=None)
     status: ClassStatus = Field(default=ClassStatus.OK)
