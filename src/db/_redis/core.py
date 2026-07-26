@@ -16,26 +16,24 @@ from ..common import RedisConfig
 
 class RedisManager:
     r: Optional[aioredis.Redis] = None
-    _cfg = RedisConfig()
 
     @classmethod
     def create_redis(cls) -> None:
-        if cls.r is not None:
-            return
-
-        pool = aioredis.ConnectionPool(
-            host=cls._cfg.host,
-            port=cls._cfg.port,
-            username=cls._cfg.user,
-            password=cls._cfg.password,
-            db=0,
-            max_connections=10,
-            decode_responses=True,
-        )
-        cls.r = aioredis.Redis(
-            connection_pool=pool,
-            protocol=2,
-        )
+        if cls.r is None:
+            _cfg = RedisConfig()
+            pool = aioredis.ConnectionPool(
+                host=_cfg.host,
+                port=_cfg.port,
+                username=_cfg.user,
+                password=_cfg.password,
+                db=0,
+                max_connections=10,
+                decode_responses=True,
+            )
+            cls.r = aioredis.Redis(
+                connection_pool=pool,
+                protocol=2,
+            )
 
     @classmethod
     async def close_redis(cls) -> None:
@@ -56,11 +54,11 @@ class RedisManager:
 
     @classmethod
     async def verify_access_token(cls, token: str) -> Optional[str]:
-        return await cls.get_redis().get(name=ACCESS_PREFIX.format(token))  # type: ignore
+        return await cls.get_redis().get(name=access(token))  # type: ignore
 
     @classmethod
     async def verify_refresh_token(cls, token: str) -> Optional[str]:
-        return await cls.get_redis().get(name=REFRESH_PREFIX.format(token))  # type: ignore
+        return await cls.get_redis().get(name=refresh(token))  # type: ignore
 
     @classmethod
     async def set_access_token(cls, token: str, uid: str):

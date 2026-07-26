@@ -11,13 +11,13 @@ from ..common import DBConfig
 # 但生产环境下 调用方可以考虑自行调用 `create_engine` 以提前初始化 db
 class DBEngine:
     _engine: Optional[Engine] = None
-    _cfg = DBConfig()
 
     @classmethod
     def create_engine(cls) -> None:
         if cls._engine is None:
+            _cfg = DBConfig()
             cls._engine = sql.create_engine(
-                url=cls._cfg.url,
+                url=_cfg.url,
                 pool_pre_ping=True,
                 pool_recycle=3600,
             )
