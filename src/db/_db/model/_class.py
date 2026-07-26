@@ -1,6 +1,6 @@
-from enum import IntEnum
 from typing import Optional
 
+from pydantic import BaseModel
 from sqlmodel import Field, Integer
 
 from .define import MyBaseModel, ClassStatus
@@ -18,15 +18,18 @@ class Class(BaseClass, table=True):
     __tablename__ = "class"  # type: ignore
 
 
-class CreateClass(MyBaseModel):
-    name: str
-    course: Optional[str] = None
-    status: ClassStatus = ClassStatus.OK
-    private: bool = False
-
-
 class UpdateClass(MyBaseModel):
     status: Optional[ClassStatus] = None
     name: Optional[str] = None
     course: Optional[str] = None
     private: Optional[bool] = None
+
+
+# dto
+class CreateClass(BaseModel):
+    model_config = {"strict": True}
+
+    name: str = Field(...)
+    course: Optional[str] = Field(default=None)
+    status: ClassStatus = Field(default=ClassStatus.OK)
+    private: bool = Field(default=False)

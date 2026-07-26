@@ -1,4 +1,3 @@
-from enum import IntEnum
 from typing import Optional
 
 from pydantic import BaseModel
@@ -36,20 +35,6 @@ class User(BaseUser, table=True):
     __tablename__ = "user_rft"  # type: ignore
 
 
-class CreateUser(BaseModel):
-    uid: str = Field(min_length=10, max_length=10, description="uid")
-    password: str = Field(min_length=8, max_length=18, description="password")
-    name: str = Field(min_length=2, description="name")
-    role: Role = Field(default=Role.Student)
-    gender: Gender
-    college: str
-
-    # only for status
-    grade: Optional[str] = Field(default=None)
-    class_: Optional[str] = Field(default=None)
-    major: Optional[str] = Field(default=None)
-
-
 class UpdateUser(MyBaseModel):
     password: Optional[str] = None
     status: Optional[UserStatus] = None
@@ -80,3 +65,20 @@ class UserPublic(SQLModel, table=False):
         sa_column_kwargs={"name": "class"},
     )
     major: Optional[str] = Field(default=None, max_length=255, nullable=True)
+
+
+# dto
+class CreateUser(BaseModel):
+    model_config = {"strict": True}
+
+    uid: str = Field(..., min_length=10, max_length=10, description="uid")
+    password: str = Field(..., min_length=8, max_length=18, description="password")
+    name: str = Field(..., min_length=2, description="name")
+    role: Role = Field(default=Role.Student)
+    gender: Gender
+    college: str
+
+    # only for status
+    grade: Optional[str] = Field(default=None)
+    class_: Optional[str] = Field(default=None)
+    major: Optional[str] = Field(default=None)

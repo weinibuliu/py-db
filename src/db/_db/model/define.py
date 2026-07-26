@@ -38,8 +38,6 @@ class ClassRecordStatus(IntEnum):
     Deleted = 100
 
 
-
-
 class MyBaseModel(SQLModel):
     id: int = Field(default=None, primary_key=True)
 
