@@ -45,3 +45,17 @@ pip install -r requirements.txt
 import db
 # ...
 ```
+
+Redis 连接生命周期与业务场景分别由不同模块负责：
+
+```python
+from db import RedisClient, SessionStore
+
+redis_client = RedisClient()
+sessions = SessionStore(redis_client.get())
+
+await sessions.create(uid, access_token, refresh_token)
+owner_uid = await sessions.verify_access(access_token)
+
+await redis_client.close()
+```

@@ -7,38 +7,35 @@ from pathlib import Path
 
 import pytest
 import pytest_asyncio
-import redis.asyncio as aioredis
 from dotenv import dotenv_values
 from sqlmodel import SQLModel, create_engine
 
 from src.db._db.engine import DBEngine
-from src.db._redis.core import RedisManager
+from src.db.common import RedisConfig
+from src.db._redis import RedisClient, SessionStore
 
 TEST_ENV_PATH = Path.cwd() / "test.env"
 
 
-def _redis_test_config() -> dict[str, object]:
+def _redis_test_config() -> RedisConfig:
     """只从 test.env 构造 Redis 配置，避免误用根目录 .env。"""
     values = dotenv_values(TEST_ENV_PATH)
+
+    host = values.get("REDIS_HOST")
+    if not host:
+        raise RuntimeError("REDIS_HOST in test.env must not be empty")
 
     try:
         port = int(values["REDIS_PORT"])  # type: ignore[arg-type]
     except (TypeError, ValueError) as exc:
         raise RuntimeError("REDIS_PORT in test.env must be an integer") from exc
 
-    config: dict[str, object] = {
-        "host": values["REDIS_HOST"],
-        "port": port,
-    }
-
-    username = values.get("REDIS_USER")
-    password = values.get("REDIS_PASSWORD")
-    if username:
-        config["username"] = username
-    if password:
-        config["password"] = password
-
-    return config
+    return RedisConfig(
+        host=host,
+        port=port,
+        user=values.get("REDIS_USER"),
+        password=values.get("REDIS_PASSWORD"),
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -59,26 +56,18 @@ def setup_test_db(monkeypatch):
 
 
 @pytest_asyncio.fixture
-async def redis_manager(monkeypatch):
+async def session_store():
     """连接专用测试 Redis，并在每条测试前后清空 DB 0。"""
-    config = _redis_test_config()
-    pool = aioredis.ConnectionPool(
-        **config,  # type: ignore
-        db=0,
-        max_connections=10,
-        decode_responses=True,
-    )
-    client = aioredis.Redis(connection_pool=pool, protocol=2)
+    redis_client = RedisClient(_redis_test_config())
+    client = redis_client.get()
     ready = False
 
     try:
         await client.ping()
         await client.flushdb()
         ready = True
-        monkeypatch.setattr(RedisManager, "r", client)
-
-        yield RedisManager
+        yield SessionStore(client)
     finally:
         if ready:
             await client.flushdb()
-        await client.aclose(close_connection_pool=True)
+        await redis_client.close()

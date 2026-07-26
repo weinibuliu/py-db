@@ -1,7 +1,7 @@
 """
-Redis Lua Scripts
+Session Redis Lua scripts.
 
-All scripts assume a single-session-per-user model.  Callers must pass fully
+All scripts assume a single-session-per-user model. Callers must pass fully
 formatted Redis keys through ``KEYS``; raw tokens are never interpreted by Lua.
 The current key scheme targets standalone Redis; Redis Cluster would require
 all keys used by a script to share one hash slot.
