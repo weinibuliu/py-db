@@ -1,12 +1,44 @@
 """
-将 DBEngine 重定向到 SQLite 内存数据库，
-确保每次测试在干净的表结构上运行，不污染真实数据库。
+测试数据库基础设施：SQL 使用 SQLite 内存数据库，Redis 使用 test.env
+指定的专用实例，确保每条测试从干净状态开始。
 """
 
+from pathlib import Path
+
 import pytest
+import pytest_asyncio
+import redis.asyncio as aioredis
+from dotenv import dotenv_values
 from sqlmodel import SQLModel, create_engine
 
 from src.db._db.engine import DBEngine
+from src.db._redis.core import RedisManager
+
+TEST_ENV_PATH = Path.cwd() / "test.env"
+
+
+def _redis_test_config() -> dict[str, object]:
+    """只从 test.env 构造 Redis 配置，避免误用根目录 .env。"""
+    values = dotenv_values(TEST_ENV_PATH)
+
+    try:
+        port = int(values["REDIS_PORT"])  # type: ignore[arg-type]
+    except (TypeError, ValueError) as exc:
+        raise RuntimeError("REDIS_PORT in test.env must be an integer") from exc
+
+    config: dict[str, object] = {
+        "host": values["REDIS_HOST"],
+        "port": port,
+    }
+
+    username = values.get("REDIS_USER")
+    password = values.get("REDIS_PASSWORD")
+    if username:
+        config["username"] = username
+    if password:
+        config["password"] = password
+
+    return config
 
 
 @pytest.fixture(autouse=True)
@@ -24,3 +56,29 @@ def setup_test_db(monkeypatch):
 
     # 测试后清理
     SQLModel.metadata.drop_all(engine)
+
+
+@pytest_asyncio.fixture
+async def redis_manager(monkeypatch):
+    """连接专用测试 Redis，并在每条测试前后清空 DB 0。"""
+    config = _redis_test_config()
+    pool = aioredis.ConnectionPool(
+        **config,  # type: ignore
+        db=0,
+        max_connections=10,
+        decode_responses=True,
+    )
+    client = aioredis.Redis(connection_pool=pool, protocol=2)
+    ready = False
+
+    try:
+        await client.ping()
+        await client.flushdb()
+        ready = True
+        monkeypatch.setattr(RedisManager, "r", client)
+
+        yield RedisManager
+    finally:
+        if ready:
+            await client.flushdb()
+        await client.aclose(close_connection_pool=True)
