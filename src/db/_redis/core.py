@@ -1,5 +1,4 @@
-import asyncio
-from typing import Optional
+from typing import List, Optional, Union, overload
 
 import redis.asyncio as aioredis
 
@@ -11,6 +10,7 @@ from .define import (
     refresh,
     refresh_idx,
 )
+from .scripts import DEL_SESSION, NEW_SESSION, REFRESH_SESSION
 from ..common import RedisConfig
 
 
@@ -61,91 +61,81 @@ class RedisManager:
         return await cls.get_redis().get(name=refresh(token))  # type: ignore
 
     @classmethod
-    async def set_access_token(cls, token: str, uid: str):
-        """
-        NOTE: 在 /login 接口内调用时 应当先执行 `clear_tokens` 吊销已有 tokens
-        """
-        access_token = access(token)
-        access_index = access_idx(uid)
-
-        r = cls.get_redis()
-        async with r.pipeline(transaction=True) as pipe:
-            # ACC:{token} -> uid
-            # u_acc:{uid} -> ACC:{token}
-            pipe.set(name=access_token, value=uid, ex=ACCESS_TTL)
-            pipe.set(name=access_index, value=access_token, ex=ACCESS_TTL)
-            await pipe.execute()
+    async def _run_script(
+        cls,
+        script: str,
+        keys: List[str],
+        args: List[Union[str, int]],
+    ) -> int:
+        result = await cls.get_redis().eval(script, len(keys), *keys, *args)
+        if type(result) is not int:
+            raise TypeError(
+                f"Redis Lua script returned {type(result).__name__}, expected int"
+            )
+        return result
 
     @classmethod
-    async def set_refresh_token(cls, token: str, uid: str):
-        refresh_token = refresh(token)
-        refresh_index = refresh_idx(uid)
+    async def new_session(
+        cls,
+        uid: str,
+        access_token: str,
+        refresh_token: Optional[str] = None,
+    ) -> bool:
+        """撤销旧会话并创建新会话；refresh token 可选。"""
+        assert uid
+        assert access_token
+        assert refresh_token != ""
 
-        r = cls.get_redis()
-        async with r.pipeline(transaction=True) as pipe:
-            # REF:{token} -> uid
-            # u_ref:{uid} -> REF:{token}
-            pipe.set(name=refresh_token, value=uid, ex=REFRESH_TTL)
-            pipe.set(name=refresh_index, value=refresh_token, ex=REFRESH_TTL)
-            await pipe.execute()
+        keys = [access_idx(uid), refresh_idx(uid), access(access_token)]
+        args: List[Union[str, int]] = [uid, ACCESS_TTL]
 
-    @classmethod
-    async def set_tokens(cls, access_token: str, refresh_token: str, uid: str):
-        access_token = access(access_token)
-        access_index = access_idx(uid)
-        refresh_token = refresh(refresh_token)
-        refresh_index = refresh_idx(uid)
+        if refresh_token is not None:
+            keys.append(refresh(refresh_token))
+            args.append(REFRESH_TTL)
 
-        r = cls.get_redis()
-        async with r.pipeline(transaction=True) as pipe:
-            pipe.set(name=access_token, value=uid, ex=ACCESS_TTL)
-            pipe.set(name=access_index, value=access_token, ex=ACCESS_TTL)
-            pipe.set(name=refresh_token, value=uid, ex=REFRESH_TTL)
-            pipe.set(name=refresh_index, value=refresh_token, ex=REFRESH_TTL)
-            await pipe.execute()
+        return await cls._run_script(NEW_SESSION, keys, args) == 1
 
     @classmethod
-    async def clear_access_token(cls, uid: str):
-        r = cls.get_redis()
+    async def del_session(cls, uid: str) -> int:
+        """撤销用户当前会话，返回实际删除的 Redis key 数量。"""
+        if not uid:
+            raise ValueError("uid must not be empty")
 
-        idx = access_idx(uid)
-        token = await r.get(idx)
-        if token is None or type(token) != str:
-            return
-
-        async with r.pipeline(transaction=True) as pipe:
-            pipe.delete(idx)
-            pipe.delete(token)
-            await pipe.execute()
-
-    # NOTE: 不单独提供吊销 refresh_token 的吊销方法 即清除 refresh 时一并清除 access
-    # @classmethod
-    # async def clear_refresh_token(cls, uid: str):
-    #     r = cls.get_redis()
-
-    #     idx = refresh_idx(uid)
-    #     token = await r.get(idx)
-    #     if token is None or type(token) != str:
-    #         return
-
-    #     async with r.pipeline(transaction=True) as pipe:
-    #         pipe.delete(idx)
-    #         pipe.delete(token)
-    #         await pipe.execute()
+        return await cls._run_script(
+            DEL_SESSION,
+            [access_idx(uid), refresh_idx(uid)],
+            [],
+        )
 
     @classmethod
-    async def clear_tokens(cls, uid: str):
-        r = cls.get_redis()
+    async def refresh_session(
+        cls,
+        uid: str,
+        refresh_token: str,
+        new_access_token: str,
+    ) -> bool:
+        """校验当前 refresh token，并原子替换 access token。"""
+        if not uid:
+            raise ValueError("uid must not be empty")
+        if not refresh_token:
+            raise ValueError("refresh_token must not be empty")
+        if not new_access_token:
+            raise ValueError("new_access_token must not be empty")
 
-        acc_idx = access_idx(uid)
-        ref_idx = refresh_idx(uid)
-        acc_token, ref_token = await asyncio.gather(r.get(acc_idx), r.get(ref_idx))
+        assert uid
+        assert refresh_token
+        assert new_access_token
 
-        async with r.pipeline(transaction=True) as pipe:
-            if isinstance(acc_token, str):
-                pipe.delete(acc_token)
-                pipe.delete(acc_idx)
-            if isinstance(ref_token, str):
-                pipe.delete(ref_token)
-                pipe.delete(ref_idx)
-            await pipe.execute()
+        return (
+            await cls._run_script(
+                REFRESH_SESSION,
+                [
+                    access_idx(uid),
+                    refresh_idx(uid),
+                    refresh(refresh_token),
+                    access(new_access_token),
+                ],
+                [uid, ACCESS_TTL],
+            )
+            == 1
+        )
