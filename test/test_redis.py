@@ -2,14 +2,13 @@ import asyncio
 
 import pytest
 
-from src.db._redis import (
+from src.db.redis import (
     create_session,
     refresh_session,
     revoke_session,
     verify_access,
     verify_refresh,
 )
-
 
 pytestmark = pytest.mark.usefixtures("redis")
 

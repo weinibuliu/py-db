@@ -13,7 +13,7 @@ from sqlmodel import SQLModel, create_engine
 
 from src.db._db.engine import DBEngine
 from src.db.common import RedisConfig
-from src.db._redis.client import RedisClient
+from src.db.redis.client import RedisClient
 
 TEST_ENV_PATH = Path.cwd() / "test.env"
 
