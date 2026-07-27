@@ -505,7 +505,7 @@ class TestCreateClassRecord:
         """创建一条班级记录（需先有班级）"""
         create_class(cls=CreateClass(name="测试班"))
         result = create_class_record(
-            record=CreateClassRecord(uid="u001", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
         assert result == CreateStatus.OK
 
@@ -514,10 +514,10 @@ class TestCreateClassRecord:
         create_class(cls=CreateClass(name="A班"))
         create_class(cls=CreateClass(name="B班"))
         r1 = create_class_record(
-            record=CreateClassRecord(uid="u001", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
         r2 = create_class_record(
-            record=CreateClassRecord(uid="u001", role=Role.Student, class_id=2)
+            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=2)
         )
         assert r1 == CreateStatus.OK
         assert r2 == CreateStatus.OK
@@ -526,10 +526,10 @@ class TestCreateClassRecord:
         """重复 (uid, class_id) 组合应返回 Existed"""
         create_class(cls=CreateClass(name="测试班"))
         create_class_record(
-            record=CreateClassRecord(uid="u001", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
         result = create_class_record(
-            record=CreateClassRecord(uid="u001", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
         assert result == CreateStatus.Existed
 
@@ -537,7 +537,7 @@ class TestCreateClassRecord:
         """教师也可被关联到班级"""
         create_class(cls=CreateClass(name="教师班"))
         result = create_class_record(
-            record=CreateClassRecord(uid="t001", role=Role.Teacher, class_id=1)
+            record=CreateClassRecord(uid="t001000000", role=Role.Teacher, class_id=1)
         )
         assert result == CreateStatus.OK
 
@@ -550,18 +550,18 @@ class TestReadClassRecord:
         create_class(cls=CreateClass(name="A班"))
         create_class(cls=CreateClass(name="B班"))
         create_class_record(
-            record=CreateClassRecord(uid="u001", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="u001", role=Role.Student, class_id=2)
+            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=2)
         )
         create_class_record(
-            record=CreateClassRecord(uid="u002", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="u002000000", role=Role.Student, class_id=1)
         )
 
-        records = get_class_record(uid="u001")
+        records = get_class_record(uid="u001000000")
         assert len(records) == 2
-        assert all(r.uid == "u001" for r in records)
+        assert all(r.uid == "u001000000" for r in records)
 
     def test_get_by_uid_empty(self):
         """按 uid 查询无记录的用户，返回空列表"""
@@ -573,20 +573,20 @@ class TestReadClassRecord:
         """按 role 查询"""
         create_class(cls=CreateClass(name="班"))
         create_class_record(
-            record=CreateClassRecord(uid="t001", role=Role.Teacher, class_id=1)
+            record=CreateClassRecord(uid="t001000000", role=Role.Teacher, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="s001", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="s001000000", role=Role.Student, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="s002", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="s002000000", role=Role.Student, class_id=1)
         )
 
         teachers = get_class_record(role=Role.Teacher)
         students = get_class_record(role=Role.Student)
 
         assert len(teachers) == 1
-        assert teachers[0].uid == "t001"
+        assert teachers[0].uid == "t001000000"
         assert len(students) == 2
 
     def test_get_by_class_id(self):
@@ -594,13 +594,13 @@ class TestReadClassRecord:
         create_class(cls=CreateClass(name="A班"))
         create_class(cls=CreateClass(name="B班"))
         create_class_record(
-            record=CreateClassRecord(uid="s001", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="s001000000", role=Role.Student, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="s002", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="s002000000", role=Role.Student, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="s003", role=Role.Student, class_id=2)
+            record=CreateClassRecord(uid="s003000000", role=Role.Student, class_id=2)
         )
 
         class1 = get_class_record(class_id=1)
@@ -614,12 +614,15 @@ class TestReadClassRecord:
         create_class(cls=CreateClass(name="班"))
         create_class_record(
             record=CreateClassRecord(
-                uid="ok", role=Role.Student, class_id=1, status=ClassRecordStatus.OK
+                uid="ok00000000",
+                role=Role.Student,
+                class_id=1,
+                status=ClassRecordStatus.OK,
             )
         )
         create_class_record(
             record=CreateClassRecord(
-                uid="del",
+                uid="del0000000",
                 role=Role.Student,
                 class_id=1,
                 status=ClassRecordStatus.Deleted,
@@ -630,9 +633,9 @@ class TestReadClassRecord:
         deleted = get_class_record(status=ClassRecordStatus.Deleted)
 
         assert len(ok) == 1
-        assert ok[0].uid == "ok"
+        assert ok[0].uid == "ok00000000"
         assert len(deleted) == 1
-        assert deleted[0].uid == "del"
+        assert deleted[0].uid == "del0000000"
 
 
 class TestUpdateClassRecord:
@@ -643,13 +646,13 @@ class TestUpdateClassRecord:
         create_class(cls=CreateClass(name="A班"))
         create_class(cls=CreateClass(name="B班"))
         create_class_record(
-            record=CreateClassRecord(uid="u001", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
 
         result = update_class_record(
             id=1,
             data=UpdateClassRecord(
-                uid="u002",
+                uid="u002000000",
                 role=Role.Teacher,
                 class_id=2,
                 status=ClassRecordStatus.Deleted,
@@ -660,7 +663,7 @@ class TestUpdateClassRecord:
         records = get_class_record(status=ClassRecordStatus.Deleted)
         assert len(records) == 1
         r = records[0]
-        assert r.uid == "u002"
+        assert r.uid == "u002000000"
         assert r.role == Role.Teacher
         assert r.class_id == 2
 
@@ -668,13 +671,13 @@ class TestUpdateClassRecord:
         """仅更新部分字段"""
         create_class(cls=CreateClass(name="A班"))
         create_class_record(
-            record=CreateClassRecord(uid="u001", role=Role.Student, class_id=1)
+            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
 
         result = update_class_record(id=1, data=UpdateClassRecord(role=Role.Teacher))
         assert result == UpdateStatus.OK
 
-        records = get_class_record(uid="u001")
+        records = get_class_record(uid="u001000000")
         assert len(records) == 1
         assert records[0].role == Role.Teacher
         assert records[0].class_id == 1  # 未变
