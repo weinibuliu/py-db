@@ -48,3 +48,4 @@ class DBEngine:
 
 create_engine = DBEngine.create_engine
 close_engine = DBEngine.close_engine
+get_session = DBEngine.session

@@ -1,5 +1,4 @@
-from .engine import DBEngine as db
-from .engine import create_engine, close_engine
+from .engine import create_engine, close_engine, get_session
 from .model import Role, Gender
 from .model import User, Class, ClassRecord, CreateUser, CreateClass, CreateClassRecord
 from .model import UpdateUser, UpdateClass, UpdateClassRecord
@@ -7,12 +6,6 @@ from .model import UserStatus, ClassStatus, ClassRecordStatus
 from .model import User, Class, ClassRecord
 from .model import UserPublic
 
-from .crud.create import (
-    create_user,
-    create_class,
-    create_class_record,
-    CreateStatus,
-)
 from .crud.read import (
     get_user,
     get_class,
@@ -21,9 +14,9 @@ from .crud.read import (
     get_user_by_id,
     get_user_by_uid,
 )
-from .crud.update import update_user, update_class, update_class_record, UpdateStatus
-
-get_session = db.session
+from .crud.create import create_user, create_class, create_class_record
+from .crud.update import update_user, update_class, update_class_record
+from .crud.define import CreateStatus, UpdateStatus
 
 __all__ = [
     "create_engine",

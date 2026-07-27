@@ -1,5 +1,4 @@
 from contextlib import nullcontext
-from enum import IntEnum
 from typing import Optional
 
 from sqlmodel import Session, select
@@ -8,16 +7,7 @@ from ..engine import DBEngine as db
 from ..model import User
 from ..model import Class, CreateUser, CreateClass, CreateClassRecord
 from ..model import ClassRecord
-
-
-class CreateStatus(IntEnum):
-    OK = 0
-    Partially = 1  # only a part of data successes
-
-    Existed = 100
-
-    Unknown = 500
-    ValueError = 501
+from .define import CreateStatus
 
 
 def create_user(

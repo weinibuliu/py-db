@@ -8,8 +8,8 @@ U — Update  (update_user / update_class / update_class_record)
 未涉及 Delete，因为项目采用逻辑删除策略，不对外提供 DELETE 接口。
 """
 
+from src import db
 from src.db._db import (
-    db,
     # Create
     create_user,
     create_class,
@@ -689,7 +689,7 @@ class TestUpdateClassRecord:
 
 class TestExternalSession:
     def test_create_read_update_with_shared_session(self):
-        with db.session() as ss:
+        with db.get_session() as ss:
             create_result = create_user(
                 usr=CreateUser(
                     uid="tx00100000",
@@ -718,7 +718,7 @@ class TestExternalSession:
         assert user.name == "事务内更新"  # type: ignore[union-attr]
 
     def test_external_session_rollback_discards_changes(self):
-        with db.session() as ss:
+        with db.get_session() as ss:
             result = create_user(
                 usr=CreateUser(
                     uid="rback00001",

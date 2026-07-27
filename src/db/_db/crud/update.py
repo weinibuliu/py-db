@@ -1,5 +1,4 @@
 from contextlib import nullcontext
-from enum import IntEnum
 from typing import Optional
 
 from sqlmodel import Session, select
@@ -9,17 +8,7 @@ from ..model import User
 from ..model import Class
 from ..model import ClassRecord
 from ..model import UpdateUser, UpdateClass, UpdateClassRecord
-
-
-class UpdateStatus(IntEnum):
-    OK = 0
-
-    PrimaryKeyNotFound = 1  # 按自增主键查找未找到结果
-    NotFound = 2  # 按逻辑(不一定是逻辑主键)查找未找到结果
-    Multiple = 3  # 按逻辑查找到多个对象 无法具体到单条记录
-
-    Unknown = 500
-
+from .define import UpdateStatus
 
 # update_* 系列函数将提供除自增主键、逻辑主键外所有字段的更新接口
 # 具体字段是否可变需要下游自行处理
