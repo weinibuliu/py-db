@@ -46,19 +46,6 @@ class User(BaseUser, table=True):
     )
 
 
-class UpdateUser(MyBaseModel):
-    password: Optional[str] = None
-    status: Optional[UserStatus] = None
-    name: Optional[str] = None
-    role: Optional[Role] = None
-    gender: Optional[Gender] = None
-    college: Optional[str] = None
-    reason: Optional[str] = None
-    grade: Optional[str] = None
-    class_: Optional[str] = None
-    major: Optional[str] = None
-
-
 class UserPublic(SQLModel, table=False):
     uid: str = Field(max_length=255, nullable=False)
 
@@ -79,6 +66,19 @@ class UserPublic(SQLModel, table=False):
 
 
 # dto
+class UpdateUser(BaseModel):
+    password: Optional[str] = None
+    status: Optional[UserStatus] = None
+    name: Optional[str] = None
+    role: Optional[Role] = None
+    gender: Optional[Gender] = None
+    college: Optional[str] = None
+    reason: Optional[str] = None
+    grade: Optional[str] = None
+    class_: Optional[str] = None
+    major: Optional[str] = None
+
+
 class CreateUser(BaseModel):
     uid: str = Field(..., min_length=10, max_length=10, description="uid")
     password: str = Field(..., min_length=8, max_length=18, description="password")

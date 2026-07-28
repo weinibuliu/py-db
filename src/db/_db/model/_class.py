@@ -31,14 +31,14 @@ class Class(BaseClass, table=True):
     )
 
 
-class UpdateClass(MyBaseModel):
+# dto
+class UpdateClass(BaseModel):
     status: Optional[ClassStatus] = None
     name: Optional[str] = None
     course: Optional[str] = None
     private: Optional[bool] = None
 
 
-# dto
 class CreateClass(BaseModel):
     name: str = Field(...)
     course: Optional[str] = Field(default=None)

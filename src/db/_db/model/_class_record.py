@@ -33,14 +33,14 @@ class ClassRecord(BaseClassRecord, table=True):
     )
 
 
-class UpdateClassRecord(MyBaseModel):
+# dto
+class UpdateClassRecord(BaseModel):
     status: Optional[ClassRecordStatus] = None
     uid: Optional[str] = None
     role: Optional[Role] = None
     class_id: Optional[int] = None
 
 
-# dto
 class CreateClassRecord(BaseModel):
     uid: str = Field(..., min_length=10, max_length=10, description="uid")
     role: Role = Field(...)
