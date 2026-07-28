@@ -8,7 +8,10 @@ U — Update  (update_user / update_class / update_class_record)
 未涉及 Delete，因为项目采用逻辑删除策略，不对外提供 DELETE 接口。
 """
 
+import pytest
+
 from src import db
+from src.db import AlreadyExistsError, NotFoundError
 from src.db._db import (
     # Create
     create_user,
@@ -39,8 +42,8 @@ from src.db._db import (
     ClassStatus,
     ClassRecordStatus,
 )
-from src.db._db.crud.create import CreateStatus
-from src.db._db.crud.update import UpdateStatus
+
+pytestmark = pytest.mark.usefixtures("setup_test_db")
 
 # ============================================================
 #  User (user_rft)  —  CRU
@@ -51,7 +54,7 @@ class TestCreateUser:
     """create_user"""
 
     def test_create_ok(self):
-        """创建一个新用户，应返回 OK"""
+        """创建一个新用户，应成功完成。"""
         result = create_user(
             usr=CreateUser(
                 uid="2024001001",
@@ -65,7 +68,7 @@ class TestCreateUser:
                 major="软件工程",
             )
         )
-        assert result == CreateStatus.OK
+        assert result is None
 
     def test_create_minimal_fields(self):
         """仅传必填字段创建用户，可选字段留空"""
@@ -79,10 +82,10 @@ class TestCreateUser:
                 college="",
             )
         )
-        assert result == CreateStatus.OK
+        assert result is None
 
     def test_create_duplicate_uid(self):
-        """重复 uid 创建应返回 Existed"""
+        """重复 uid 创建应抛出 AlreadyExistsError。"""
         create_user(
             usr=CreateUser(
                 uid="dup0010000",
@@ -93,17 +96,17 @@ class TestCreateUser:
                 college="",
             )
         )
-        result = create_user(
-            usr=CreateUser(
-                uid="dup0010000",
-                password="another12",
-                name="赵六",
-                role=Role.Teacher,
-                gender=Gender.Female,
-                college="",
+        with pytest.raises(AlreadyExistsError):
+            create_user(
+                usr=CreateUser(
+                    uid="dup0010000",
+                    password="another12",
+                    name="赵六",
+                    role=Role.Teacher,
+                    gender=Gender.Female,
+                    college="",
+                )
             )
-        )
-        assert result == CreateStatus.Existed
 
 
 class TestReadUser:
@@ -298,7 +301,7 @@ class TestUpdateUser:
                 reason="测试原因",
             ),
         )
-        assert result == UpdateStatus.OK
+        assert result is None
 
         user = get_user_by_uid(uid="upd0010000")
         assert user is not None
@@ -326,7 +329,7 @@ class TestUpdateUser:
             )
         )
         result = update_user(uid="upd0020000", data=UpdateUser(name="新名字"))
-        assert result == UpdateStatus.OK
+        assert result is None
 
         user = get_user_by_uid(uid="upd0020000")
         assert user is not None
@@ -352,16 +355,16 @@ class TestUpdateUser:
             uid="upd0030000",
             data=UpdateUser(status=UserStatus.Banned, reason="违规"),
         )
-        assert result == UpdateStatus.OK
+        assert result is None
 
         user = get_user_by_uid(uid="upd0030000")
         assert user is not None
         assert user.status == UserStatus.Banned
 
     def test_update_not_found(self):
-        """更新不存在的用户，应返回 NotFound"""
-        result = update_user(uid="no_such_user", data=UpdateUser(name="新名字"))
-        assert result == UpdateStatus.NotFound
+        """更新不存在的用户应抛出 NotFoundError。"""
+        with pytest.raises(NotFoundError):
+            update_user(uid="no_such_user", data=UpdateUser(name="新名字"))
 
 
 # ============================================================
@@ -373,18 +376,18 @@ class TestCreateClass:
     """create_class"""
 
     def test_create_ok(self):
-        """创建一个班级，应返回 OK"""
+        """创建一个班级应成功完成。"""
         result = create_class(
             cls=CreateClass(name="蓝桥1班", course="2026年蓝桥杯培训")
         )
-        assert result == CreateStatus.OK
+        assert result is None
 
     def test_create_with_status(self):
         """以指定状态创建班级"""
         result = create_class(
             cls=CreateClass(name="已结束班", course="旧课程", status=ClassStatus.Ended)
         )
-        assert result == CreateStatus.OK
+        assert result is None
 
 
 class TestReadClass:
@@ -463,7 +466,7 @@ class TestUpdateClass:
                 private=True,
             ),
         )
-        assert result == UpdateStatus.OK
+        assert result is None
 
         cls = get_class_by_id(id=1)
         assert cls is not None
@@ -480,7 +483,7 @@ class TestUpdateClass:
         """仅更新班级名称"""
         create_class(cls=CreateClass(name="原名"))
         result = update_class(id=1, data=UpdateClass(name="改名"))
-        assert result == UpdateStatus.OK
+        assert result is None
 
         cls = get_class_by_id(id=1)
         assert cls is not None
@@ -488,9 +491,9 @@ class TestUpdateClass:
         assert cls.course is None  # type: ignore[union-attr]  # 未改
 
     def test_update_not_found(self):
-        """更新不存在的班级，应返回 PrimaryKeyNotFound"""
-        result = update_class(id=9999, data=UpdateClass(name="新名"))
-        assert result == UpdateStatus.PrimaryKeyNotFound
+        """更新不存在的班级应抛出 NotFoundError。"""
+        with pytest.raises(NotFoundError):
+            update_class(id=9999, data=UpdateClass(name="新名"))
 
 
 # ============================================================
@@ -507,7 +510,7 @@ class TestCreateClassRecord:
         result = create_class_record(
             record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
-        assert result == CreateStatus.OK
+        assert result is None
 
     def test_create_multiple_records_same_user(self):
         """同一用户可属于多个班级"""
@@ -519,19 +522,21 @@ class TestCreateClassRecord:
         r2 = create_class_record(
             record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=2)
         )
-        assert r1 == CreateStatus.OK
-        assert r2 == CreateStatus.OK
+        assert r1 is None
+        assert r2 is None
 
     def test_create_duplicate(self):
-        """重复 (uid, class_id) 组合应返回 Existed"""
+        """重复 (uid, class_id) 组合应抛出 AlreadyExistsError。"""
         create_class(cls=CreateClass(name="测试班"))
         create_class_record(
             record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
-        result = create_class_record(
-            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
-        )
-        assert result == CreateStatus.Existed
+        with pytest.raises(AlreadyExistsError):
+            create_class_record(
+                record=CreateClassRecord(
+                    uid="u001000000", role=Role.Student, class_id=1
+                )
+            )
 
     def test_create_teacher_record(self):
         """教师也可被关联到班级"""
@@ -539,7 +544,7 @@ class TestCreateClassRecord:
         result = create_class_record(
             record=CreateClassRecord(uid="t001000000", role=Role.Teacher, class_id=1)
         )
-        assert result == CreateStatus.OK
+        assert result is None
 
 
 class TestReadClassRecord:
@@ -658,7 +663,7 @@ class TestUpdateClassRecord:
                 status=ClassRecordStatus.Deleted,
             ),
         )
-        assert result == UpdateStatus.OK
+        assert result is None
 
         records = get_class_record(status=ClassRecordStatus.Deleted)
         assert len(records) == 1
@@ -675,7 +680,7 @@ class TestUpdateClassRecord:
         )
 
         result = update_class_record(id=1, data=UpdateClassRecord(role=Role.Teacher))
-        assert result == UpdateStatus.OK
+        assert result is None
 
         records = get_class_record(uid="u001000000")
         assert len(records) == 1
@@ -683,11 +688,11 @@ class TestUpdateClassRecord:
         assert records[0].class_id == 1  # 未变
 
     def test_update_not_found(self):
-        """更新不存在的记录，应返回 PrimaryKeyNotFound"""
-        result = update_class_record(
-            id=9999, data=UpdateClassRecord(status=ClassRecordStatus.Deleted)
-        )
-        assert result == UpdateStatus.PrimaryKeyNotFound
+        """更新不存在的记录应抛出 NotFoundError。"""
+        with pytest.raises(NotFoundError):
+            update_class_record(
+                id=9999, data=UpdateClassRecord(status=ClassRecordStatus.Deleted)
+            )
 
 
 class TestExternalSession:
@@ -709,8 +714,8 @@ class TestExternalSession:
             )
             user = get_user_by_uid(uid="tx00100000", ss=ss)
 
-            assert create_result == CreateStatus.OK
-            assert update_result == UpdateStatus.OK
+            assert create_result is None
+            assert update_result is None
             assert user is not None
             assert user.name == "事务内更新"  # type: ignore[union-attr]
 
@@ -733,7 +738,7 @@ class TestExternalSession:
                 ),
                 ss=ss,
             )
-            assert result == CreateStatus.OK
+            assert result is None
             assert get_user_by_uid(uid="rback00001", ss=ss) is not None
 
             ss.rollback()
