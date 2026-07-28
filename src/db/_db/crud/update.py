@@ -2,13 +2,15 @@ from contextlib import nullcontext
 from typing import Optional
 
 from sqlmodel import Session, select
+from sqlalchemy import exc
 
 from ..engine import DBEngine as db
 from ..model import User
 from ..model import Class
 from ..model import ClassRecord
 from ..model import UpdateUser, UpdateClass, UpdateClassRecord
-from .define import UpdateStatus
+from ...common import NotFoundError
+from ..utils import write_session
 
 # update_* 系列函数将提供除自增主键、逻辑主键外所有字段的更新接口
 # 具体字段是否可变需要下游自行处理
@@ -22,66 +24,42 @@ def update_user(
     uid: str,
     data: UpdateUser,
     ss: Optional[Session] = None,
-) -> UpdateStatus:
-    auto_commit = ss is None
-    with db.session() if ss is None else nullcontext(ss) as session:
+) -> None:
+    with write_session(ss) as session:
         stat = select(User).where(User.uid == uid)
 
         usr: Optional[User] = session.exec(stat).first()
         if usr is None:
-            return UpdateStatus.NotFound
+            raise NotFoundError()
 
-        for field, value in data.model_dump(exclude_unset=True).items():
-            setattr(usr, field, value)
-
-        if auto_commit:
-            session.commit()
-        else:
-            session.flush()
-        return UpdateStatus.OK
+        usr.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
 
 
 def update_class(
     id: int,
     data: UpdateClass,
     ss: Optional[Session] = None,
-) -> UpdateStatus:
-    auto_commit = ss is None
-    with db.session() if ss is None else nullcontext(ss) as session:
+) -> None:
+    with write_session(ss) as session:
         stat = select(Class).where(Class.id == id)
 
         cls: Optional[Class] = session.exec(stat).first()
         if cls is None:
-            return UpdateStatus.PrimaryKeyNotFound
+            raise NotFoundError()
 
-        for field, value in data.model_dump(exclude_unset=True).items():
-            setattr(cls, field, value)
-
-        if auto_commit:
-            session.commit()
-        else:
-            session.flush()
-        return UpdateStatus.OK
+        cls.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
 
 
 def update_class_record(
     id: int,
     data: UpdateClassRecord,
     ss: Optional[Session] = None,
-) -> UpdateStatus:
-    auto_commit = ss is None
-    with db.session() if ss is None else nullcontext(ss) as session:
+) -> None:
+    with write_session(ss) as session:
         stat = select(ClassRecord).where(ClassRecord.id == id)
 
         record: Optional[ClassRecord] = session.exec(stat).first()
         if record is None:
-            return UpdateStatus.PrimaryKeyNotFound
+            raise NotFoundError()
 
-        for field, value in data.model_dump(exclude_unset=True).items():
-            setattr(record, field, value)
-
-        if auto_commit:
-            session.commit()
-        else:
-            session.flush()
-        return UpdateStatus.OK
+        record.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))

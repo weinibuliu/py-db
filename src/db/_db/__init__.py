@@ -16,7 +16,6 @@ from .crud.read import (
 )
 from .crud.create import create_user, create_class, create_class_record
 from .crud.update import update_user, update_class, update_class_record
-from .crud.define import CreateStatus, UpdateStatus
 
 __all__ = [
     "create_engine",
@@ -47,8 +46,6 @@ __all__ = [
     "update_user",
     "update_class",
     "update_class_record",
-    "CreateStatus",
-    "UpdateStatus",
     "get_session",
     # "BaseUser",
     # "BaseClass",
