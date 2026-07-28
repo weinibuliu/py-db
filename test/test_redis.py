@@ -2,7 +2,7 @@ import asyncio
 
 import pytest
 
-from src.db.redis import (
+from db.redis import (
     create_session,
     refresh_session,
     revoke_session,

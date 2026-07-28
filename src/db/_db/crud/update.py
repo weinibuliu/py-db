@@ -4,13 +4,12 @@ from typing import Optional
 from sqlmodel import Session, select
 from sqlalchemy import exc
 
-from ..engine import DBEngine as db
 from ..model import User
 from ..model import Class
 from ..model import ClassRecord
 from ..model import UpdateUser, UpdateClass, UpdateClassRecord
 from ...common import NotFoundError
-from ..utils import write_session
+from ..engine import write_session
 
 # update_* 系列函数将提供除自增主键、逻辑主键外所有字段的更新接口
 # 具体字段是否可变需要下游自行处理

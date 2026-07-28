@@ -5,7 +5,7 @@ from sqlmodel import Session
 from ..model import User
 from ..model import Class, CreateUser, CreateClass, CreateClassRecord
 from ..model import ClassRecord
-from ..utils import write_session
+from ..engine import write_session
 
 
 def create_user(

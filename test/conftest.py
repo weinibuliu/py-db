@@ -11,9 +11,9 @@ import redis.asyncio as aioredis
 from dotenv import dotenv_values
 from sqlmodel import SQLModel, create_engine
 
-from src.db._db.engine import DBEngine
-from src.db.common import DBConfig, RedisConfig
-from src.db.redis.client import RedisClient
+from db._db.engine import DBEngine
+from db.common import DBConfig, RedisConfig
+from db.redis.client import RedisClient
 
 TEST_ENV_PATH = Path.cwd() / "test.env"
 

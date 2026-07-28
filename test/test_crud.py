@@ -10,9 +10,9 @@ U — Update  (update_user / update_class / update_class_record)
 
 import pytest
 
-from src import db
-from src.db import AlreadyExistsError, NotFoundError
-from src.db._db import (
+import db
+from db import AlreadyExistsError, NotFoundError
+from db._db import (
     # Create
     create_user,
     create_class,

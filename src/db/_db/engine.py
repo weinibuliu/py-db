@@ -2,9 +2,19 @@ from contextlib import contextmanager
 from typing import Generator, Optional
 
 import sqlmodel as sql
-from sqlalchemy import Engine
+from sqlmodel import Session
+from sqlalchemy import Engine, exc
 
-from ..common import DBConfig
+from ..common import (
+    DBConfig,
+    DBError,
+    AlreadyExistsError,
+    BackendError,
+    BackendTimeoutError,
+    BackendUnavailableError,
+    DataIntegrityError,
+)
+from .utils import is_unique_violation
 
 
 # 默认情况下 下游无需显式初始化数据库连接 而是在调用时自动懒加载
@@ -45,7 +55,45 @@ class DBEngine:
         with sql.Session(cls.get_engine()) as _session:
             yield _session
 
+    @classmethod
+    @contextmanager
+    def write_session(
+        cls,
+        ss: Optional[Session] = None,
+    ) -> Generator[Session, None, None]:
+        """管理 session 生命周期"""
+
+        try:
+            if ss is None:
+                with cls.session() as session:
+                    yield session
+                    session.commit()
+            else:
+                yield ss
+                ss.flush()
+
+        except DBError:
+            raise
+
+        except exc.IntegrityError as e:
+            if is_unique_violation(e):
+                raise AlreadyExistsError() from e
+            raise DataIntegrityError() from e
+
+        except exc.TimeoutError as e:
+            raise BackendTimeoutError() from e
+
+        except exc.DBAPIError as e:
+            if e.connection_invalidated:
+                raise BackendUnavailableError() from e
+
+            raise BackendError() from e
+
+        except exc.SQLAlchemyError as e:
+            raise BackendError() from e
+
 
 create_engine = DBEngine.create_engine
 close_engine = DBEngine.close_engine
 get_session = DBEngine.session
+write_session = DBEngine.write_session

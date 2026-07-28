@@ -1,13 +1,13 @@
 import pytest
 from sqlalchemy import exc
 
-from src.db._db.utils import write_session
-from src.db.common import (
+from db import (
     BackendError,
     BackendTimeoutError,
     BackendUnavailableError,
     NotFoundError,
 )
+from db._db.engine import write_session
 
 
 class FakeSession:
