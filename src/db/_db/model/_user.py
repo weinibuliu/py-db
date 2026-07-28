@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 from sqlmodel import Field, Integer, SQLModel
+from sqlalchemy import Index
 
 from .define import Role, Gender, MyBaseModel, UserStatus
 
@@ -32,7 +33,17 @@ class BaseUser(MyBaseModel):
 
 
 class User(BaseUser, table=True):
+    """User Table"""
+
     __tablename__ = "user_rft"  # type: ignore
+
+    __table_args__ = (
+        Index("user_uid_uindex", "uid", unique=True),
+        Index("user_rft_status_index", "status"),
+        Index("user_rft_name_index", "name"),
+        Index("user_rft_role_index", "role"),
+        Index("user_rft_created_by_index", "created_by"),
+    )
 
 
 class UpdateUser(MyBaseModel):

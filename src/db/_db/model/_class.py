@@ -2,6 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 from sqlmodel import Field, Integer
+from sqlalchemy import Index
 
 from .define import MyBaseModel, ClassStatus
 
@@ -15,7 +16,19 @@ class BaseClass(MyBaseModel):
 
 
 class Class(BaseClass, table=True):
+    """Class Table"""
+
     __tablename__ = "class"  # type: ignore
+    __table_args__ = (
+        Index(
+            "class_name_course_status_uindex", "name", "course", "status", unique=True
+        ),
+        Index("class_status_index", "status"),
+        Index("class_name_index", "name"),
+        Index("class_course_index", "course"),
+        Index("class_private_index", "private"),
+        Index("class_created_by_index", "created_by"),
+    )
 
 
 class UpdateClass(MyBaseModel):

@@ -1,7 +1,8 @@
 from typing import Optional
 
-from sqlmodel import Field, Integer
 from pydantic import BaseModel
+from sqlmodel import Field, Integer
+from sqlalchemy import Index
 
 from .define import MyBaseModel, Role, ClassRecordStatus
 
@@ -19,7 +20,17 @@ class BaseClassRecord(MyBaseModel):
 
 
 class ClassRecord(BaseClassRecord, table=True):
+    """ClassRecord Table"""
+
     __tablename__ = "class_record"  # type: ignore
+    __table_args__ = (
+        Index("class_record_uid_class_id_uindex", "uid", "class_id", unique=True),
+        Index("class_record_uid_index", "uid"),
+        Index("class_record_status_index", "status"),
+        Index("class_record_role_index", "role"),
+        Index("class_record_class_id_index", "class_id"),
+        Index("class_record_created_by_index", "created_by"),
+    )
 
 
 class UpdateClassRecord(MyBaseModel):
