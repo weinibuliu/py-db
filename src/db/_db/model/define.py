@@ -45,3 +45,9 @@ class MyBaseModel(SQLModel):
     edited_at: int = Field(default_factory=_now, sa_column_kwargs={"onupdate": _now})
 
     created_by: Optional[str] = Field(default=None, description="creator's uid")
+    edited_by: Optional[str] = Field(default=None, description="editor's uid")
+
+
+class DTOBaseModel(SQLModel):
+    created_by: Optional[str] = Field(default=None, description="creator's uid")
+    edited_by: Optional[str] = Field(default=None, description="editor's uid")
