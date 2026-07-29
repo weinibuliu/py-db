@@ -1,8 +1,6 @@
-from contextlib import nullcontext
 from typing import Optional
 
 from sqlmodel import Session, select
-from sqlalchemy import exc
 
 from ..model import User
 from ..model import Class

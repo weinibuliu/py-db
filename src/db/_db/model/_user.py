@@ -1,10 +1,9 @@
 from typing import Optional
 
-from pydantic import BaseModel
 from sqlmodel import Field, Integer, SQLModel
 from sqlalchemy import Index
 
-from .define import Role, Gender, MyBaseModel, UserStatus
+from .define import Role, Gender, MyBaseModel, UserStatus, DTOBaseModel
 
 
 class BaseUser(MyBaseModel):
@@ -66,7 +65,7 @@ class UserPublic(SQLModel, table=False):
 
 
 # dto
-class UpdateUser(BaseModel):
+class UpdateUser(DTOBaseModel):
     password: Optional[str] = None
     status: Optional[UserStatus] = None
     name: Optional[str] = None
@@ -79,7 +78,7 @@ class UpdateUser(BaseModel):
     major: Optional[str] = None
 
 
-class CreateUser(BaseModel):
+class CreateUser(DTOBaseModel):
     uid: str = Field(..., min_length=10, max_length=10, description="uid")
     password: str = Field(..., min_length=8, max_length=18, description="password")
     name: str = Field(..., min_length=2, description="name")

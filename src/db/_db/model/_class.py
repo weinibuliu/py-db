@@ -1,10 +1,9 @@
 from typing import Optional
 
-from pydantic import BaseModel
 from sqlmodel import Field, Integer
 from sqlalchemy import Index
 
-from .define import MyBaseModel, ClassStatus
+from .define import MyBaseModel, ClassStatus, DTOBaseModel
 
 
 class BaseClass(MyBaseModel):
@@ -32,14 +31,14 @@ class Class(BaseClass, table=True):
 
 
 # dto
-class UpdateClass(BaseModel):
+class UpdateClass(DTOBaseModel):
     status: Optional[ClassStatus] = None
     name: Optional[str] = None
     course: Optional[str] = None
     private: Optional[bool] = None
 
 
-class CreateClass(BaseModel):
+class CreateClass(DTOBaseModel):
     name: str = Field(...)
     course: Optional[str] = Field(default=None)
     status: ClassStatus = Field(default=ClassStatus.OK)
