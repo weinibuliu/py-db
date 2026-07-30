@@ -72,8 +72,8 @@ class DBEngine:
                 yield ss
                 ss.flush()
 
-        except DBError:
-            raise
+        # except DBError as e:
+        #     raise e
 
         except exc.IntegrityError as e:
             if is_unique_violation(e):

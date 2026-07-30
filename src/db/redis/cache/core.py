@@ -11,5 +11,5 @@ async def set_user_cache(uid: str, cache: UserCache):
     )
 
 
-async def delete_user_cache(uid: str):
+async def revoke_user_cache(uid: str):
     await RedisClient.delete(uid)
