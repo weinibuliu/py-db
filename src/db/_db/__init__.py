@@ -1,4 +1,4 @@
-from .engine import create_engine, close_engine, get_session
+from .engine import create_engine, close_engine, get_session, create_all
 from .model import Role, Gender
 from .model import User, Class, ClassRecord, CreateUser, CreateClass, CreateClassRecord
 from .model import UpdateUser, UpdateClass, UpdateClassRecord
@@ -20,6 +20,8 @@ from .crud.update import update_user, update_class, update_class_record
 __all__ = [
     "create_engine",
     "close_engine",
+    "get_session",
+    "create_all",
     "Role",
     "Gender",
     "User",
@@ -46,7 +48,6 @@ __all__ = [
     "update_user",
     "update_class",
     "update_class_record",
-    "get_session",
     # "BaseUser",
     # "BaseClass",
     # "BaseClassRecord",
