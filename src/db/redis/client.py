@@ -71,8 +71,8 @@ class RedisClient:
         """key -= amount"""
         return await cls.get_client().decr(name, amount)
 
-    @asynccontextmanager
     @classmethod
+    @asynccontextmanager
     async def pipeline(cls, transaction: bool = True):
         """自动调用 pipeline.execute()"""
         pipe = cls.get_client().pipeline(transaction)
