@@ -53,8 +53,8 @@ class RedisClient:
         await cls.get_client().set(name, value, ex=ex)
 
     @classmethod
-    async def delete(cls, name: str):
-        await cls.get_client().delete(name)
+    async def delete(cls, *keys: str):
+        await cls.get_client().delete(*keys)
 
     @classmethod
     async def eval(cls, script: str, numkeys: int, *keys_and_args: Any) -> int:

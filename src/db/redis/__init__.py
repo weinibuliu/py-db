@@ -7,8 +7,10 @@ from .session import (
     verify_refresh,
 )
 from .session.define import ACCESS_TTL, REFRESH_TTL
+from . import cache
 
 __all__ = [
+    "cache",
     "create_redis",
     "close_redis",
     "create_session",
