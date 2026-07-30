@@ -4,10 +4,10 @@ from ..client import RedisClient
 from .define import (
     ACCESS_TTL,
     REFRESH_TTL,
-    access,
-    access_idx,
-    refresh,
-    refresh_idx,
+    _access,
+    _access_idx,
+    _refresh,
+    _refresh_idx,
 )
 from .scripts import DEL_SESSION, NEW_SESSION, REFRESH_SESSION
 
@@ -16,14 +16,14 @@ async def verify_access(token: str) -> Optional[str]:
     if not token:
         raise ValueError("token must not be empty")
 
-    return await RedisClient.get(name=access(token))
+    return await RedisClient.get(name=_access(token))
 
 
 async def verify_refresh(token: str) -> Optional[str]:
     if not token:
         raise ValueError("token must not be empty")
 
-    return await RedisClient.get(name=refresh(token))
+    return await RedisClient.get(name=_refresh(token))
 
 
 async def _run_script(
@@ -39,7 +39,7 @@ async def _run_script(
     return result
 
 
-async def create_session(
+async def create(
     uid: str,
     access_token: str,
     refresh_token: Optional[str] = None,
@@ -52,29 +52,29 @@ async def create_session(
     if refresh_token == "":
         raise ValueError("refresh_token must not be empty")
 
-    keys = [access_idx(uid), refresh_idx(uid), access(access_token)]
+    keys = [_access_idx(uid), _refresh_idx(uid), _access(access_token)]
     args: List[Union[str, int]] = [uid, ACCESS_TTL]
 
     if refresh_token is not None:
-        keys.append(refresh(refresh_token))
+        keys.append(_refresh(refresh_token))
         args.append(REFRESH_TTL)
 
     return await _run_script(NEW_SESSION, keys, args) == 1
 
 
-async def revoke_session(uid: str) -> int:
+async def revoke(uid: str) -> int:
     """Revoke the current session and return the deleted key count."""
     if not uid:
         raise ValueError("uid must not be empty")
 
     return await _run_script(
         DEL_SESSION,
-        [access_idx(uid), refresh_idx(uid)],
+        [_access_idx(uid), _refresh_idx(uid)],
         [],
     )
 
 
-async def refresh_session(
+async def refresh(
     uid: str,
     refresh_token: str,
     new_access_token: str,
@@ -91,21 +91,12 @@ async def refresh_session(
         await _run_script(
             REFRESH_SESSION,
             [
-                access_idx(uid),
-                refresh_idx(uid),
-                refresh(refresh_token),
-                access(new_access_token),
+                _access_idx(uid),
+                _refresh_idx(uid),
+                _refresh(refresh_token),
+                _access(new_access_token),
             ],
             [uid, ACCESS_TTL],
         )
         == 1
     )
-
-
-__all__ = [
-    "create_session",
-    "revoke_session",
-    "refresh_session",
-    "verify_access",
-    "verify_refresh",
-]

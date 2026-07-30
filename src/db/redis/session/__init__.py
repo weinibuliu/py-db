@@ -1,15 +1,15 @@
 from .core import (
-    create_session,
-    refresh_session,
-    revoke_session,
+    create,
+    refresh,
+    revoke,
     verify_access,
     verify_refresh,
 )
 
 __all__ = [
-    "create_session",
-    "revoke_session",
-    "refresh_session",
+    "create",
+    "revoke",
+    "refresh",
     "verify_access",
     "verify_refresh",
 ]
