@@ -7,7 +7,6 @@ from sqlalchemy import Engine, exc
 
 from ..common import (
     DBConfig,
-    DBError,
     AlreadyExistsError,
     BackendError,
     BackendTimeoutError,
