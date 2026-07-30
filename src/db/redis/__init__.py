@@ -1,8 +1,9 @@
 from .client import close_redis, create_redis
 from .session.define import ACCESS_TTL, REFRESH_TTL
-from . import cache, session
+from . import analyze, cache, session
 
 __all__ = [
+    "analyze",
     "cache",
     "session",
     "create_redis",
