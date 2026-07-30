@@ -42,36 +42,9 @@ pip install -r requirements.txt
 然后可以 import 使用
 
 ```python
+# sql
 import db
+# redis
+from db import redis
 # ...
-```
-
-Redis 与 SQL 数据库采用相同的模块级调用方式。FastAPI lifespan 只负责连接生命周期：
-
-```python
-from contextlib import asynccontextmanager
-
-from fastapi import FastAPI
-
-from db import close_redis, create_redis, create_session
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    create_redis()
-    try:
-        yield
-    finally:
-        await close_redis()
-
-
-app = FastAPI(lifespan=lifespan)
-
-
-async def login():
-    await create_session(
-        uid,
-        access_token,
-        refresh_token,
-    )
 ```
