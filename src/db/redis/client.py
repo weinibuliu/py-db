@@ -46,18 +46,29 @@ class RedisClient:
 
     @classmethod
     async def get(cls, name: str) -> Optional[str]:
-        r = cls.get_client()
-        return await r.get(name)  # type: ignore
+        return await cls.get_client().get(name)  # type: ignore
 
     @classmethod
-    async def set(cls, name: str, value: str, ex: int) -> None:
-        r = cls.get_client()
-        r.set(name, value, ex=ex)
+    async def set(cls, name: str, value: str, ex: int = -1) -> None:
+        await cls.get_client().set(name, value, ex=ex)
+
+    @classmethod
+    async def delete(cls, name: str):
+        await cls.get_client().delete(name)
 
     @classmethod
     async def eval(cls, script: str, numkeys: int, *keys_and_args: Any) -> int:
-        r = cls.get_client()
-        return await r.eval(script, numkeys, *keys_and_args)
+        return await cls.get_client().eval(script, numkeys, *keys_and_args)
+
+    @classmethod
+    async def incr(cls, name: str, amount: int = 1) -> int:
+        """key += amount"""
+        return await cls.get_client().incr(name, amount)
+
+    @classmethod
+    async def decr(cls, name: str, amount: int = 1) -> int:
+        """key -= amount"""
+        return await cls.get_client().decr(name, amount)
 
 
 create_redis = RedisClient.create_client
