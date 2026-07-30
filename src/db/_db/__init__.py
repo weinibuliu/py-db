@@ -1,8 +1,6 @@
 from .engine import create_engine, close_engine, get_session, create_all
-from .model import Role, Gender
 from .model import User, Class, ClassRecord, CreateUser, CreateClass, CreateClassRecord
 from .model import UpdateUser, UpdateClass, UpdateClassRecord
-from .model import UserStatus, ClassStatus, ClassRecordStatus
 from .model import User, Class, ClassRecord
 from .model import UserPublic
 
@@ -16,6 +14,8 @@ from .crud.read import (
 )
 from .crud.create import create_user, create_class, create_class_record
 from .crud.update import update_user, update_class, update_class_record
+
+from ..common.define import Role, Gender, UserStatus, ClassStatus, ClassRecordStatus
 
 __all__ = [
     "create_engine",

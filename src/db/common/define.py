@@ -3,7 +3,7 @@ from typing import Optional
 
 from sqlmodel import Field, SQLModel
 
-from ...common import _now
+from .utils import _now
 
 
 class Role(IntEnum):

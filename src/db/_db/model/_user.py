@@ -3,7 +3,7 @@ from typing import Optional
 from sqlmodel import Field, Integer, SQLModel
 from sqlalchemy import Index
 
-from .define import Role, Gender, MyBaseModel, UserStatus, DTOBaseModel
+from ...common.define import Role, Gender, MyBaseModel, UserStatus, DTOBaseModel
 
 
 class BaseUser(MyBaseModel):
