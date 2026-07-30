@@ -80,7 +80,7 @@ class UpdateUser(DTOBaseModel):
 
 class CreateUser(DTOBaseModel):
     uid: str = Field(..., min_length=10, max_length=10, description="uid")
-    password: str = Field(..., min_length=8, max_length=18, description="password")
+    password: str = Field(..., description="encrypt password")
     name: str = Field(..., min_length=2, description="name")
     role: Role = Field(default=Role.Student)
     gender: Gender = Field(...)
