@@ -29,7 +29,8 @@ def _db_test_config() -> DBConfig:
     """只从 test.env 构造专用 MySQL 测试配置。"""
     values = dotenv_values(TEST_ENV_PATH)
 
-    host = _required_test_value(values, "DB_HOST")
+    # host = _required_test_value(values, "DB_HOST")
+    host = "localhost"
     port_value = _required_test_value(values, "DB_PORT")
     name = _required_test_value(values, "DB_NAME")
     user = _required_test_value(values, "DB_USER")
@@ -53,9 +54,8 @@ def _redis_test_config() -> RedisConfig:
     """只从 test.env 构造 Redis 测试配置。"""
     values = dotenv_values(TEST_ENV_PATH)
 
-    host = values.get("REDIS_HOST")
-    if not host:
-        raise RuntimeError("REDIS_HOST in test.env must not be empty")
+    # host = values.get("REDIS_HOST")
+    host = "localhost"
 
     try:
         port = int(values["REDIS_PORT"])  # type: ignore[arg-type]
