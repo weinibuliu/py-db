@@ -18,6 +18,8 @@ async def revoke_user_cache(uid: str):
 
 
 async def read_user_cache(uid: str) -> UserCache:
+    """如果查表和缓存均失败 抛出 NotFoundError"""
+
     r = await RedisClient.get(_user(uid))
     if r is not None:
         return UserCache.model_validate_json(r)
