@@ -95,8 +95,7 @@ class DBEngine:
     @classmethod
     def create_all_table(cls):
         """!!!ONLY FOR DEV MODE!!!"""
-        assert cls._engine is not None
-        sql.SQLModel.metadata.create_all(cls._engine)
+        sql.SQLModel.metadata.create_all(cls.get_engine())
 
 
 create_engine = DBEngine.create_engine
