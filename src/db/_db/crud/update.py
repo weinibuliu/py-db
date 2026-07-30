@@ -2,9 +2,7 @@ from typing import Optional
 
 from sqlmodel import Session, select
 
-from ..model import User
-from ..model import Class
-from ..model import ClassRecord
+from ..model import User, Class, ClassRecord
 from ..model import UpdateUser, UpdateClass, UpdateClassRecord
 from ...common import NotFoundError
 from ..engine import write_session

@@ -4,9 +4,10 @@ from typing import Optional
 from sqlmodel import Session, select
 
 from ..engine import DBEngine as db
-from ..model import User, UserStatus
+from ..model import User
 from ..model import Class, ClassStatus
-from ..model import ClassRecord, ClassRecordStatus, Role
+from ..model import ClassRecord
+from ...common.define import UserStatus, ClassRecordStatus, Role
 
 
 def get_user_by_id(id: str, ss: Optional[Session] = None) -> Optional[User]:

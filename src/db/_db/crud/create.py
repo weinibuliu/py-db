@@ -3,8 +3,8 @@ from typing import Optional
 from sqlmodel import Session
 
 from ..model import User
-from ..model import Class, CreateUser, CreateClass, CreateClassRecord
-from ..model import ClassRecord
+from ..model import CreateUser, CreateClass, CreateClassRecord
+from ..model import Class, ClassRecord
 from ..engine import write_session
 
 
