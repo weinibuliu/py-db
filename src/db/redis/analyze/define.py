@@ -1,3 +1,4 @@
+TOTAL_COUNT_KEY = "path:total"
 ROUTE_COUNT_PREFIX = "path:"
 
 
