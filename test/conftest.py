@@ -124,4 +124,4 @@ async def redis(monkeypatch):
     finally:
         if ready:
             await client.flushdb()
-        await RedisClient.close()
+        await RedisClient.close_client()

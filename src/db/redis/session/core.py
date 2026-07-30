@@ -16,14 +16,14 @@ async def verify_access(token: str) -> Optional[str]:
     if not token:
         raise ValueError("token must not be empty")
 
-    return await RedisClient.get().get(name=access(token))  # type: ignore
+    return await RedisClient.get(name=access(token))
 
 
 async def verify_refresh(token: str) -> Optional[str]:
     if not token:
         raise ValueError("token must not be empty")
 
-    return await RedisClient.get().get(name=refresh(token))  # type: ignore
+    return await RedisClient.get(name=refresh(token))
 
 
 async def _run_script(
@@ -31,7 +31,7 @@ async def _run_script(
     keys: List[str],
     args: List[Union[str, int]],
 ) -> int:
-    result = await RedisClient.get().eval(script, len(keys), *keys, *args)
+    result = await RedisClient.eval(script, len(keys), *keys, *args)
     if type(result) is not int:
         raise TypeError(
             f"Redis Lua script returned {type(result).__name__}, expected int"

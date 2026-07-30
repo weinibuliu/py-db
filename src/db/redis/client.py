@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Any, Optional
 
 import redis.asyncio as aioredis
 
@@ -11,7 +11,7 @@ class RedisClient:
     _client: Optional[aioredis.Redis] = None
 
     @classmethod
-    def create(cls) -> None:
+    def create_client(cls) -> None:
         if cls._client is None:
             config = RedisConfig()
             pool = aioredis.ConnectionPool(
@@ -29,24 +29,42 @@ class RedisClient:
             )
 
     @classmethod
-    def get(cls) -> aioredis.Redis:
+    def get_client(cls) -> aioredis.Redis:
         if cls._client is None:
-            cls.create()
+            cls.create_client()
 
         assert cls._client is not None
         return cls._client
 
     @classmethod
-    async def close(cls) -> None:
+    async def close_client(cls) -> None:
         if cls._client is None:
             return
 
         await cls._client.aclose(close_connection_pool=True)
         cls._client = None
 
+    @classmethod
+    async def get(cls, name: str) -> Optional[str]:
+        r = cls.get_client()
+        return await r.get(name)  # type: ignore
 
-create_redis = RedisClient.create
-close_redis = RedisClient.close
+    @classmethod
+    async def set(cls, name: str, value: str, ex: int) -> None:
+        r = cls.get_client()
+        r.set(name, value, ex=ex)
+
+    @classmethod
+    async def eval(cls, script: str, numkeys: int, *keys_and_args: Any) -> int:
+        r = cls.get_client()
+        return await r.eval(script, numkeys, *keys_and_args)
 
 
-__all__ = ["create_redis", "close_redis"]
+create_redis = RedisClient.create_client
+close_redis = RedisClient.close_client
+
+
+__all__ = [
+    "create_redis",
+    "close_redis",
+]
