@@ -1,4 +1,5 @@
 from typing import Any, Optional
+from contextlib import asynccontextmanager
 
 import redis.asyncio as aioredis
 
@@ -69,6 +70,15 @@ class RedisClient:
     async def decr(cls, name: str, amount: int = 1) -> int:
         """key -= amount"""
         return await cls.get_client().decr(name, amount)
+
+    @asynccontextmanager
+    @classmethod
+    async def pipeline(cls, transaction: bool = True):
+        """自动调用 pipeline.execute()"""
+        pipe = cls.get_client().pipeline(transaction)
+        yield pipe
+
+        await pipe.execute()
 
 
 create_redis = RedisClient.create_client
