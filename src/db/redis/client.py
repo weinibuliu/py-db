@@ -72,13 +72,30 @@ class RedisClient:
         return await cls.get_client().decr(name, amount)
 
     @classmethod
+    async def expire(cls, name: str, time) -> bool:
+        return await cls.get_client().expire(name, time)
+
+    @classmethod
+    async def rpush(cls, name: str, *values: Any) -> int:
+        return await cls.get_client().rpush(name, *values)
+
+    @classmethod
+    async def lrange(cls, name: str, start: int, end: int) -> list[str]:
+        return await cls.get_client().lrange(name, start, end)  # type: ignore
+
+    @classmethod
+    async def lpop(cls, name: str, count: Optional[int] = None):
+        return await cls.get_client().lpop(name, count)
+
+    @classmethod
     @asynccontextmanager
-    async def pipeline(cls, transaction: bool = True):
+    async def pipeline(cls, *, transaction: bool = True, auto_execute: bool = True):
         """自动调用 pipeline.execute()"""
         pipe = cls.get_client().pipeline(transaction)
         yield pipe
 
-        await pipe.execute()
+        if auto_execute:
+            await pipe.execute()
 
 
 create_redis = RedisClient.create_client

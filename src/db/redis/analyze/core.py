@@ -1,4 +1,4 @@
-from typing import Optional, overload
+from typing import Optional
 
 from ..client import RedisClient
 from .define import Prefix, TOTAL_COUNT_KEY, TRACEBACK_TTL

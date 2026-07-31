@@ -45,6 +45,7 @@ class ChatSessionStatus(IntEnum):
     Deleted = 100
 
 
+# TODO: 如果 pydantic 未正确处理 StrEnum 则换用 Literal
 class ChatRole(StrEnum):
     system = "system"
     assistant = "assistant"
