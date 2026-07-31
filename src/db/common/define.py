@@ -1,4 +1,4 @@
-from enum import IntEnum
+from enum import IntEnum, StrEnum
 from typing import Optional
 
 from sqlmodel import Field, SQLModel
@@ -36,6 +36,19 @@ class ClassRecordStatus(IntEnum):
     OK = 0
 
     Deleted = 100
+
+
+class ChatSessionStatus(IntEnum):
+    OK = 0
+    Archived = 1
+
+    Deleted = 100
+
+
+class ChatRole(StrEnum):
+    system = "system"
+    assistant = "assistant"
+    user = "user"
 
 
 class MyBaseModel(SQLModel):
