@@ -9,3 +9,11 @@
 Redis Key: CSS:{session_id}
 
 > CSS: Chat Session
+
+## 下游调用
+```python
+from db import redis
+
+redis.chat_cache.get_session_cache(...)
+redis.chat_cache.push_message(...)
+```
