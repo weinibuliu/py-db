@@ -24,7 +24,7 @@ class ClassRecord(BaseClassRecord, table=True):
     __tablename__ = "class_record"  # type: ignore
     __table_args__ = (
         Index("class_record_uid_class_id_uindex", "uid", "class_id", unique=True),
-        Index("class_record_uid_index", "uid"),
+        # Index("class_record_uid_index", "uid"),
         Index("class_record_status_index", "status"),
         Index("class_record_role_index", "role"),
         Index("class_record_class_id_index", "class_id"),
