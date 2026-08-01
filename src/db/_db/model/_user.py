@@ -66,16 +66,16 @@ class UserPublic(SQLModel, table=False):
 
 # dto
 class UpdateUser(DTOBaseModel):
-    password: Optional[str] = None
-    status: Optional[UserStatus] = None
-    name: Optional[str] = None
-    role: Optional[Role] = None
-    gender: Optional[Gender] = None
-    college: Optional[str] = None
-    reason: Optional[str] = None
-    grade: Optional[str] = None
-    class_: Optional[str] = None
-    major: Optional[str] = None
+    password: Optional[str] = Field(default=None)
+    status: Optional[UserStatus] = Field(default=None)
+    name: Optional[str] = Field(default=None)
+    role: Optional[Role] = Field(default=None)
+    gender: Optional[Gender] = Field(default=None)
+    college: Optional[str] = Field(default=None)
+    reason: Optional[str] = Field(default=None)
+    grade: Optional[str] = Field(default=None)
+    class_: Optional[str] = Field(default=None)
+    major: Optional[str] = Field(default=None)
 
 
 class CreateUser(DTOBaseModel):

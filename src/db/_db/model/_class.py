@@ -32,10 +32,10 @@ class Class(BaseClass, table=True):
 
 # dto
 class UpdateClass(DTOBaseModel):
-    status: Optional[ClassStatus] = None
-    name: Optional[str] = None
-    course: Optional[str] = None
-    private: Optional[bool] = None
+    status: Optional[ClassStatus] = Field(default=None)
+    name: Optional[str] = Field(default=None)
+    course: Optional[str] = Field(default=None)
+    private: Optional[bool] = Field(default=None)
 
 
 class CreateClass(DTOBaseModel):

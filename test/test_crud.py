@@ -56,7 +56,7 @@ class TestCreateUser:
     def test_create_ok(self):
         """创建一个新用户，应成功完成。"""
         result = create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="2024001001",
                 password="12345678",
                 name="张三",
@@ -73,7 +73,7 @@ class TestCreateUser:
     def test_create_minimal_fields(self):
         """仅传必填字段创建用户，可选字段留空"""
         result = create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="t001000000",
                 password="password1",
                 name="李四",
@@ -87,7 +87,7 @@ class TestCreateUser:
     def test_create_duplicate_uid(self):
         """重复 uid 创建应抛出 AlreadyExistsError。"""
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="dup0010000",
                 password="password1",
                 name="王五",
@@ -98,7 +98,7 @@ class TestCreateUser:
         )
         with pytest.raises(AlreadyExistsError):
             create_user(
-                usr=CreateUser(
+                data=CreateUser(
                     uid="dup0010000",
                     password="another12",
                     name="赵六",
@@ -115,7 +115,7 @@ class TestReadUser:
     def test_get_by_uid_found(self):
         """按 uid 查询存在的用户，应返回 User 对象"""
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="r001000000",
                 password="password1",
                 name="读测试",
@@ -141,7 +141,7 @@ class TestReadUser:
     def test_get_by_name_multiple(self):
         """按 name 查询，返回同名用户列表"""
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="n010000000",
                 password="password1",
                 name="同名",
@@ -151,7 +151,7 @@ class TestReadUser:
             )
         )
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="n020000000",
                 password="password2",
                 name="同名",
@@ -173,7 +173,7 @@ class TestReadUser:
     def test_get_by_status(self):
         """按 status 查询，仅返回匹配状态的用户"""
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="s010000000",
                 password="password1",
                 name="正常",
@@ -183,7 +183,7 @@ class TestReadUser:
             )
         )
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="s020000000",
                 password="password2",
                 name="禁用",
@@ -206,7 +206,7 @@ class TestReadUser:
     def test_get_by_role(self):
         """按 role 查询，仅返回匹配角色的用户"""
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="role_stu01",
                 password="password1",
                 name="学生A",
@@ -216,7 +216,7 @@ class TestReadUser:
             )
         )
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="role_tea01",
                 password="password2",
                 name="教师A",
@@ -226,7 +226,7 @@ class TestReadUser:
             )
         )
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="role_stu02",
                 password="password3",
                 name="学生B",
@@ -251,7 +251,7 @@ class TestReadUser:
     def test_read_after_create_all_fields_match(self):
         """创建后读取，所有字段应与创建时一致"""
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="full001000",
                 password="secret_12",
                 name="完整测试",
@@ -278,7 +278,7 @@ class TestUpdateUser:
     def test_update_all_fields(self):
         """更新用户所有可更新字段"""
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="upd0010000",
                 password="old_passw",
                 name="旧名",
@@ -319,7 +319,7 @@ class TestUpdateUser:
     def test_update_partial_fields(self):
         """仅更新部分字段，其余字段不变"""
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="upd0020000",
                 password="password1",
                 name="部分更新",
@@ -342,7 +342,7 @@ class TestUpdateUser:
     def test_update_status_to_banned(self):
         """将用户状态更新为 Banned"""
         create_user(
-            usr=CreateUser(
+            data=CreateUser(
                 uid="upd0030000",
                 password="password1",
                 name="待禁用",
@@ -378,14 +378,14 @@ class TestCreateClass:
     def test_create_ok(self):
         """创建一个班级应成功完成。"""
         result = create_class(
-            cls=CreateClass(name="蓝桥1班", course="2026年蓝桥杯培训")
+            data=CreateClass(name="蓝桥1班", course="2026年蓝桥杯培训")
         )
         assert result is None
 
     def test_create_with_status(self):
         """以指定状态创建班级"""
         result = create_class(
-            cls=CreateClass(name="已结束班", course="旧课程", status=ClassStatus.Ended)
+            data=CreateClass(name="已结束班", course="旧课程", status=ClassStatus.Ended)
         )
         assert result is None
 
@@ -395,7 +395,7 @@ class TestReadClass:
 
     def test_get_by_id_found(self):
         """按 id 查询存在的班级"""
-        create_class(cls=CreateClass(name="测试班", course="测试课程"))
+        create_class(data=CreateClass(name="测试班", course="测试课程"))
         # 自增 id 从 1 开始
         cls = get_class_by_id(id=1)
         assert cls is not None
@@ -411,9 +411,9 @@ class TestReadClass:
 
     def test_get_by_name(self):
         """按 name / course 查询班级列表"""
-        create_class(cls=CreateClass(name="A班", course="C语言"))
-        create_class(cls=CreateClass(name="B班", course="C语言"))
-        create_class(cls=CreateClass(name="C班", course="Python"))
+        create_class(data=CreateClass(name="A班", course="C语言"))
+        create_class(data=CreateClass(name="B班", course="C语言"))
+        create_class(data=CreateClass(name="C班", course="Python"))
 
         result = get_class(name="A班")
         assert isinstance(result, list)
@@ -431,8 +431,8 @@ class TestReadClass:
 
     def test_get_by_status(self):
         """按 status 查询班级列表"""
-        create_class(cls=CreateClass(name="进行中", status=ClassStatus.OK))
-        create_class(cls=CreateClass(name="已结束", status=ClassStatus.Ended))
+        create_class(data=CreateClass(name="进行中", status=ClassStatus.OK))
+        create_class(data=CreateClass(name="已结束", status=ClassStatus.Ended))
 
         ok = get_class(status=ClassStatus.OK)
         ended = get_class(status=ClassStatus.Ended)
@@ -444,7 +444,7 @@ class TestReadClass:
 
     def test_get_by_id_private(self):
         """按 id 查询私有班级"""
-        create_class(cls=CreateClass(name="私有班", private=True))
+        create_class(data=CreateClass(name="私有班", private=True))
         cls = get_class_by_id(id=1)
         assert cls is not None
         assert cls.private == True
@@ -456,7 +456,7 @@ class TestUpdateClass:
 
     def test_update_all_fields(self):
         """更新班级所有可更新字段"""
-        create_class(cls=CreateClass(name="旧班名", course="旧课程"))
+        create_class(data=CreateClass(name="旧班名", course="旧课程"))
         result = update_class(
             id=1,
             data=UpdateClass(
@@ -481,7 +481,7 @@ class TestUpdateClass:
 
     def test_update_partial(self):
         """仅更新班级名称"""
-        create_class(cls=CreateClass(name="原名"))
+        create_class(data=CreateClass(name="原名"))
         result = update_class(id=1, data=UpdateClass(name="改名"))
         assert result is None
 
@@ -506,43 +506,41 @@ class TestCreateClassRecord:
 
     def test_create_ok(self):
         """创建一条班级记录（需先有班级）"""
-        create_class(cls=CreateClass(name="测试班"))
+        create_class(data=CreateClass(name="测试班"))
         result = create_class_record(
-            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
         assert result is None
 
     def test_create_multiple_records_same_user(self):
         """同一用户可属于多个班级"""
-        create_class(cls=CreateClass(name="A班"))
-        create_class(cls=CreateClass(name="B班"))
+        create_class(data=CreateClass(name="A班"))
+        create_class(data=CreateClass(name="B班"))
         r1 = create_class_record(
-            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
         r2 = create_class_record(
-            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=2)
+            data=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=2)
         )
         assert r1 is None
         assert r2 is None
 
     def test_create_duplicate(self):
         """重复 (uid, class_id) 组合应抛出 AlreadyExistsError。"""
-        create_class(cls=CreateClass(name="测试班"))
+        create_class(data=CreateClass(name="测试班"))
         create_class_record(
-            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
         with pytest.raises(AlreadyExistsError):
             create_class_record(
-                record=CreateClassRecord(
-                    uid="u001000000", role=Role.Student, class_id=1
-                )
+                data=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
             )
 
     def test_create_teacher_record(self):
         """教师也可被关联到班级"""
-        create_class(cls=CreateClass(name="教师班"))
+        create_class(data=CreateClass(name="教师班"))
         result = create_class_record(
-            record=CreateClassRecord(uid="t001000000", role=Role.Teacher, class_id=1)
+            data=CreateClassRecord(uid="t001000000", role=Role.Teacher, class_id=1)
         )
         assert result is None
 
@@ -552,16 +550,16 @@ class TestReadClassRecord:
 
     def test_get_by_uid(self):
         """按 uid 查询某用户的所有班级记录"""
-        create_class(cls=CreateClass(name="A班"))
-        create_class(cls=CreateClass(name="B班"))
+        create_class(data=CreateClass(name="A班"))
+        create_class(data=CreateClass(name="B班"))
         create_class_record(
-            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=2)
+            data=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=2)
         )
         create_class_record(
-            record=CreateClassRecord(uid="u002000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="u002000000", role=Role.Student, class_id=1)
         )
 
         records = get_class_record(uid="u001000000")
@@ -576,15 +574,15 @@ class TestReadClassRecord:
 
     def test_get_by_role(self):
         """按 role 查询"""
-        create_class(cls=CreateClass(name="班"))
+        create_class(data=CreateClass(name="班"))
         create_class_record(
-            record=CreateClassRecord(uid="t001000000", role=Role.Teacher, class_id=1)
+            data=CreateClassRecord(uid="t001000000", role=Role.Teacher, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="s001000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="s001000000", role=Role.Student, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="s002000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="s002000000", role=Role.Student, class_id=1)
         )
 
         teachers = get_class_record(role=Role.Teacher)
@@ -596,16 +594,16 @@ class TestReadClassRecord:
 
     def test_get_by_class_id(self):
         """按 class_id 查询班级内所有成员"""
-        create_class(cls=CreateClass(name="A班"))
-        create_class(cls=CreateClass(name="B班"))
+        create_class(data=CreateClass(name="A班"))
+        create_class(data=CreateClass(name="B班"))
         create_class_record(
-            record=CreateClassRecord(uid="s001000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="s001000000", role=Role.Student, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="s002000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="s002000000", role=Role.Student, class_id=1)
         )
         create_class_record(
-            record=CreateClassRecord(uid="s003000000", role=Role.Student, class_id=2)
+            data=CreateClassRecord(uid="s003000000", role=Role.Student, class_id=2)
         )
 
         class1 = get_class_record(class_id=1)
@@ -616,9 +614,9 @@ class TestReadClassRecord:
 
     def test_get_by_status(self):
         """按 status 过滤记录"""
-        create_class(cls=CreateClass(name="班"))
+        create_class(data=CreateClass(name="班"))
         create_class_record(
-            record=CreateClassRecord(
+            data=CreateClassRecord(
                 uid="ok00000000",
                 role=Role.Student,
                 class_id=1,
@@ -626,7 +624,7 @@ class TestReadClassRecord:
             )
         )
         create_class_record(
-            record=CreateClassRecord(
+            data=CreateClassRecord(
                 uid="del0000000",
                 role=Role.Student,
                 class_id=1,
@@ -648,10 +646,10 @@ class TestUpdateClassRecord:
 
     def test_update_all_fields(self):
         """更新 class_record 所有可更新字段"""
-        create_class(cls=CreateClass(name="A班"))
-        create_class(cls=CreateClass(name="B班"))
+        create_class(data=CreateClass(name="A班"))
+        create_class(data=CreateClass(name="B班"))
         create_class_record(
-            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
 
         result = update_class_record(
@@ -674,9 +672,9 @@ class TestUpdateClassRecord:
 
     def test_update_partial(self):
         """仅更新部分字段"""
-        create_class(cls=CreateClass(name="A班"))
+        create_class(data=CreateClass(name="A班"))
         create_class_record(
-            record=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
+            data=CreateClassRecord(uid="u001000000", role=Role.Student, class_id=1)
         )
 
         result = update_class_record(id=1, data=UpdateClassRecord(role=Role.Teacher))
@@ -699,7 +697,7 @@ class TestExternalSession:
     def test_create_read_update_with_shared_session(self):
         with db.get_session() as ss:
             create_result = create_user(
-                usr=CreateUser(
+                data=CreateUser(
                     uid="tx00100000",
                     password="password1",
                     name="事务测试",
@@ -728,7 +726,7 @@ class TestExternalSession:
     def test_external_session_rollback_discards_changes(self):
         with db.get_session() as ss:
             result = create_user(
-                usr=CreateUser(
+                data=CreateUser(
                     uid="rback00001",
                     password="password1",
                     name="回滚测试",

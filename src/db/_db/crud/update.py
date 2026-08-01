@@ -2,8 +2,10 @@ from typing import Optional
 
 from sqlmodel import Session, select
 
-from ..model import User, Class, ClassRecord
-from ..model import UpdateUser, UpdateClass, UpdateClassRecord
+from ..model import User, UpdateUser
+from ..model import Class, UpdateClass
+from ..model import ClassRecord, UpdateClassRecord
+from ..model import ChatSession, UpdateChatSession
 from ...common import NotFoundError
 from ..engine import write_session
 
@@ -23,11 +25,11 @@ def update_user(
     with write_session(ss) as session:
         stat = select(User).where(User.uid == uid)
 
-        usr: Optional[User] = session.exec(stat).first()
-        if usr is None:
+        entity: Optional[User] = session.exec(stat).first()
+        if entity is None:
             raise NotFoundError()
 
-        usr.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
+        entity.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
 
 
 def update_class(
@@ -38,11 +40,11 @@ def update_class(
     with write_session(ss) as session:
         stat = select(Class).where(Class.id == id)
 
-        cls: Optional[Class] = session.exec(stat).first()
-        if cls is None:
+        entity: Optional[Class] = session.exec(stat).first()
+        if entity is None:
             raise NotFoundError()
 
-        cls.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
+        entity.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
 
 
 def update_class_record(
@@ -53,8 +55,23 @@ def update_class_record(
     with write_session(ss) as session:
         stat = select(ClassRecord).where(ClassRecord.id == id)
 
-        record: Optional[ClassRecord] = session.exec(stat).first()
-        if record is None:
+        entity: Optional[ClassRecord] = session.exec(stat).first()
+        if entity is None:
             raise NotFoundError()
 
-        record.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
+        entity.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
+
+
+def update_chat_session(
+    session_id: str,
+    data: UpdateChatSession,
+    ss: Optional[Session] = None,
+) -> None:
+    with write_session(ss) as session:
+        stat = select(ChatSession).where(ChatSession.session_id == session_id)
+
+        entity: Optional[ChatSession] = session.exec(stat).first()
+        if entity is None:
+            raise NotFoundError()
+
+        entity.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))

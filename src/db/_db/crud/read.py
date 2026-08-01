@@ -7,6 +7,8 @@ from ..engine import DBEngine as db
 from ..model import User
 from ..model import Class, ClassStatus
 from ..model import ClassRecord
+from ..model import ChatSession
+from ..model import ChatMessage
 from ...common.define import UserStatus, ClassRecordStatus, Role
 
 
@@ -113,4 +115,31 @@ def get_class_record(
         conditions.append(ClassRecord.status == status)
 
         stat = select(ClassRecord).where(*conditions)
+        return list(session.exec(stat).all())
+
+
+def get_chat_session_by_session_id(
+    session_id: str,
+    ss: Optional[Session] = None,
+) -> Optional[ChatSession]:
+    with db.session() if ss is None else nullcontext(ss) as session:
+        stat = select(ChatSession).where(ChatSession.session_id == session_id)
+        return session.exec(stat).first()
+
+
+def get_chat_message_by_message_id(
+    message_id: str,
+    ss: Optional[Session] = None,
+) -> Optional[ChatMessage]:
+    with db.session() if ss is None else nullcontext(ss) as session:
+        stat = select(ChatMessage).where(ChatMessage.message_id == message_id)
+        return session.exec(stat).first()
+
+
+def get_chat_messages_by_session(
+    session_id: str,
+    ss: Optional[Session] = None,
+) -> list[ChatMessage]:
+    with db.session() if ss is None else nullcontext(ss) as session:
+        stat = select(ChatMessage).where(ChatMessage.session_id == session_id)
         return list(session.exec(stat).all())

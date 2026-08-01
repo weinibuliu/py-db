@@ -34,10 +34,10 @@ class ClassRecord(BaseClassRecord, table=True):
 
 # dto
 class UpdateClassRecord(DTOBaseModel):
-    status: Optional[ClassRecordStatus] = None
-    uid: Optional[str] = None
-    role: Optional[Role] = None
-    class_id: Optional[int] = None
+    status: Optional[ClassRecordStatus] = Field(default=None)
+    uid: Optional[str] = Field(default=None)
+    role: Optional[Role] = Field(default=None)
+    class_id: Optional[int] = Field(default=None)
 
 
 class CreateClassRecord(DTOBaseModel):
