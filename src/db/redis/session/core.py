@@ -1,14 +1,7 @@
 from typing import List, Optional, Union
 
 from ..client import RedisClient
-from .define import (
-    ACCESS_TTL,
-    REFRESH_TTL,
-    _access,
-    _access_idx,
-    _refresh,
-    _refresh_idx,
-)
+from .define import ACCESS_TTL, REFRESH_TTL, Prefix
 from .scripts import DEL_SESSION, NEW_SESSION, REFRESH_SESSION
 
 
@@ -16,14 +9,14 @@ async def verify_access(token: str) -> Optional[str]:
     if not token:
         raise ValueError("token must not be empty")
 
-    return await RedisClient.get(name=_access(token))
+    return await RedisClient.get(name=Prefix.access(token))
 
 
 async def verify_refresh(token: str) -> Optional[str]:
     if not token:
         raise ValueError("token must not be empty")
 
-    return await RedisClient.get(name=_refresh(token))
+    return await RedisClient.get(name=Prefix.refresh(token))
 
 
 async def _run_script(
@@ -52,11 +45,15 @@ async def create(
     if refresh_token == "":
         raise ValueError("refresh_token must not be empty")
 
-    keys = [_access_idx(uid), _refresh_idx(uid), _access(access_token)]
+    keys = [
+        Prefix.access_idx(uid),
+        Prefix.refresh_idx(uid),
+        Prefix.access(access_token),
+    ]
     args: List[Union[str, int]] = [uid, ACCESS_TTL]
 
     if refresh_token is not None:
-        keys.append(_refresh(refresh_token))
+        keys.append(Prefix.refresh(refresh_token))
         args.append(REFRESH_TTL)
 
     return await _run_script(NEW_SESSION, keys, args) == 1
@@ -69,7 +66,7 @@ async def revoke(uid: str) -> int:
 
     return await _run_script(
         DEL_SESSION,
-        [_access_idx(uid), _refresh_idx(uid)],
+        [Prefix.access_idx(uid), Prefix.refresh_idx(uid)],
         [],
     )
 
@@ -91,10 +88,10 @@ async def refresh(
         await _run_script(
             REFRESH_SESSION,
             [
-                _access_idx(uid),
-                _refresh_idx(uid),
-                _refresh(refresh_token),
-                _access(new_access_token),
+                Prefix.access_idx(uid),
+                Prefix.refresh_idx(uid),
+                Prefix.refresh(refresh_token),
+                Prefix.access(new_access_token),
             ],
             [uid, ACCESS_TTL],
         )
