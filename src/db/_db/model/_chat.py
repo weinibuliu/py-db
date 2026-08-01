@@ -39,18 +39,16 @@ class BaseChatMessage(MyBaseModel):
 
 class ChatSession(BaseChatSession, table=True):
     __tablename__ = "chat_session"  # type: ignore
-    __table_args__ = [
+    __table_args__ = (
         Index("chat_session_uid_index", "uid"),
         # TODO: 建立时间戳降序索引
         # Index("chat_session_uid_edited_at_index", "uid", "edited_at"),
-    ]
+    )
 
 
 class ChatMessage(BaseChatMessage, table=True):
     __tablename__ = "chat_message"  # type: ignore
-    __table_args__ = [
-        Index("chat_message_uid_index", "uid"),
-    ]
+    __table_args__ = (Index("chat_message_uid_index", "uid"),)
 
 
 # dto
