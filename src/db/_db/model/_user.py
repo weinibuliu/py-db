@@ -3,10 +3,40 @@ from typing import Optional
 from sqlmodel import Field, Integer, SQLModel
 from sqlalchemy import Index
 
-from ...common.define import Role, Gender, MyBaseModel, UserStatus, DTOBaseModel
+from ...common.define import Role, Gender, MyBaseModel, UserStatus
+from ...common.define import CreateBaseModel, UpdateBaseModel
 
 
-class BaseUser(MyBaseModel):
+# dto
+class UserUpdate(UpdateBaseModel):
+    password: Optional[str] = Field(default=None)
+    status: Optional[UserStatus] = Field(default=None)
+    name: Optional[str] = Field(default=None)
+    role: Optional[Role] = Field(default=None)
+    gender: Optional[Gender] = Field(default=None)
+    college: Optional[str] = Field(default=None)
+    reason: Optional[str] = Field(default=None)
+    grade: Optional[str] = Field(default=None)
+    class_: Optional[str] = Field(default=None)
+    major: Optional[str] = Field(default=None)
+
+
+class UserCreate(CreateBaseModel):
+    uid: str = Field(..., min_length=10, max_length=10, description="uid")
+    password: str = Field(..., description="encrypt password")
+    name: str = Field(..., min_length=2, description="name")
+    role: Role = Field(default=Role.Student)
+    gender: Gender = Field(...)
+    college: str = Field(...)
+
+    # only for status
+    grade: Optional[str] = Field(default=None)
+    class_: Optional[str] = Field(default=None)
+    major: Optional[str] = Field(default=None)
+
+
+# define
+class BaseUser(MyBaseModel[UserCreate, UserUpdate]):
     uid: str = Field(max_length=255, nullable=False)
     password: str = Field(max_length=255, nullable=False)
 
@@ -62,31 +92,3 @@ class UserPublic(SQLModel, table=False):
         sa_column_kwargs={"name": "class"},
     )
     major: Optional[str] = Field(default=None, max_length=255, nullable=True)
-
-
-# dto
-class UpdateUser(DTOBaseModel):
-    password: Optional[str] = Field(default=None)
-    status: Optional[UserStatus] = Field(default=None)
-    name: Optional[str] = Field(default=None)
-    role: Optional[Role] = Field(default=None)
-    gender: Optional[Gender] = Field(default=None)
-    college: Optional[str] = Field(default=None)
-    reason: Optional[str] = Field(default=None)
-    grade: Optional[str] = Field(default=None)
-    class_: Optional[str] = Field(default=None)
-    major: Optional[str] = Field(default=None)
-
-
-class CreateUser(DTOBaseModel):
-    uid: str = Field(..., min_length=10, max_length=10, description="uid")
-    password: str = Field(..., description="encrypt password")
-    name: str = Field(..., min_length=2, description="name")
-    role: Role = Field(default=Role.Student)
-    gender: Gender = Field(...)
-    college: str = Field(...)
-
-    # only for status
-    grade: Optional[str] = Field(default=None)
-    class_: Optional[str] = Field(default=None)
-    major: Optional[str] = Field(default=None)

@@ -2,10 +2,10 @@ from typing import Optional
 
 from sqlmodel import Session, select
 
-from ..model import User, UpdateUser
-from ..model import Class, UpdateClass
-from ..model import ClassRecord, UpdateClassRecord
-from ..model import ChatSession, UpdateChatSession
+from ..model import User, UserUpdate
+from ..model import Class, ClassUpdate
+from ..model import ClassRecord, ClassRecordUpdate
+from ..model import ChatSession, ChatSessionUpdate
 from ...common import NotFoundError
 from ..engine import write_session
 
@@ -19,7 +19,7 @@ from ..engine import write_session
 
 def update_user(
     uid: str,
-    data: UpdateUser,
+    data: UserUpdate,
     ss: Optional[Session] = None,
 ) -> None:
     with write_session(ss) as session:
@@ -29,12 +29,12 @@ def update_user(
         if entity is None:
             raise NotFoundError()
 
-        entity.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
+        entity.apply_update(data)
 
 
 def update_class(
     id: int,
-    data: UpdateClass,
+    data: ClassUpdate,
     ss: Optional[Session] = None,
 ) -> None:
     with write_session(ss) as session:
@@ -44,12 +44,12 @@ def update_class(
         if entity is None:
             raise NotFoundError()
 
-        entity.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
+        entity.apply_update(data)
 
 
 def update_class_record(
     id: int,
-    data: UpdateClassRecord,
+    data: ClassRecordUpdate,
     ss: Optional[Session] = None,
 ) -> None:
     with write_session(ss) as session:
@@ -59,12 +59,12 @@ def update_class_record(
         if entity is None:
             raise NotFoundError()
 
-        entity.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
+        entity.apply_update(data)
 
 
 def update_chat_session(
     session_id: str,
-    data: UpdateChatSession,
+    data: ChatSessionUpdate,
     ss: Optional[Session] = None,
 ) -> None:
     with write_session(ss) as session:
@@ -74,4 +74,4 @@ def update_chat_session(
         if entity is None:
             raise NotFoundError()
 
-        entity.sqlmodel_update(data.model_dump(exclude_unset=True, exclude_none=True))
+        entity.apply_update(data)

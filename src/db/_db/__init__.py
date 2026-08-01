@@ -1,6 +1,6 @@
 from .engine import create_engine, close_engine, get_session, create_all
-from .model import User, Class, ClassRecord, CreateUser, CreateClass, CreateClassRecord
-from .model import UpdateUser, UpdateClass, UpdateClassRecord
+from .model import User, Class, ClassRecord, UserCreate, ClassCreate, ClassRecordCreate
+from .model import UserUpdate, ClassUpdate, ClassRecordUpdate
 from .model import User, Class, ClassRecord
 from .model import UserPublic
 
@@ -25,14 +25,14 @@ __all__ = [
     "Role",
     "Gender",
     "User",
-    "CreateUser",
+    "UserCreate",
     "Class",
-    "CreateClass",
+    "ClassCreate",
     "ClassRecord",
-    "CreateClassRecord",
-    "UpdateUser",
-    "UpdateClass",
-    "UpdateClassRecord",
+    "ClassRecordCreate",
+    "UserUpdate",
+    "ClassUpdate",
+    "ClassRecordUpdate",
     "UserStatus",
     "ClassStatus",
     "ClassRecordStatus",

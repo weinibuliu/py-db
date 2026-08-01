@@ -3,10 +3,27 @@ from typing import Optional
 from sqlmodel import Field, Integer
 from sqlalchemy import Index
 
-from ...common.define import MyBaseModel, ClassStatus, DTOBaseModel
+from ...common.define import MyBaseModel, ClassStatus
+from ...common.define import CreateBaseModel, UpdateBaseModel
 
 
-class BaseClass(MyBaseModel):
+# dto
+class ClassUpdate(UpdateBaseModel):
+    status: Optional[ClassStatus] = Field(default=None)
+    name: Optional[str] = Field(default=None)
+    course: Optional[str] = Field(default=None)
+    private: Optional[bool] = Field(default=None)
+
+
+class ClassCreate(CreateBaseModel):
+    name: str = Field(...)
+    course: Optional[str] = Field(default=None)
+    status: ClassStatus = Field(default=ClassStatus.OK)
+    private: bool = Field(default=False)
+
+
+# define
+class BaseClass(MyBaseModel[ClassCreate, ClassUpdate]):
     status: ClassStatus = Field(sa_type=Integer, default=ClassStatus.OK, nullable=False)
 
     name: str = Field(max_length=255, nullable=False)
@@ -28,18 +45,3 @@ class Class(BaseClass, table=True):
         Index("class_private_index", "private"),
         Index("class_created_by_index", "created_by"),
     )
-
-
-# dto
-class UpdateClass(DTOBaseModel):
-    status: Optional[ClassStatus] = Field(default=None)
-    name: Optional[str] = Field(default=None)
-    course: Optional[str] = Field(default=None)
-    private: Optional[bool] = Field(default=None)
-
-
-class CreateClass(DTOBaseModel):
-    name: str = Field(...)
-    course: Optional[str] = Field(default=None)
-    status: ClassStatus = Field(default=ClassStatus.OK)
-    private: bool = Field(default=False)

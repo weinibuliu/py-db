@@ -1,29 +1,29 @@
 from ._chat import (
     ChatSession,
     ChatMessage,
-    CreateChatSession,
-    CreateChatMessage,
-    UpdateChatSession,
+    ChatSessionCreate,
+    ChatMessageCreate,
+    ChatSessionUpdate,
 )
-from ._class import Class, CreateClass, UpdateClass, ClassStatus
-from ._class_record import ClassRecord, CreateClassRecord, UpdateClassRecord
-from ._user import User, UserPublic, UpdateUser, CreateUser
+from ._class import Class, ClassCreate, ClassUpdate, ClassStatus
+from ._class_record import ClassRecord, ClassRecordCreate, ClassRecordUpdate
+from ._user import User, UserPublic, UserUpdate, UserCreate
 
 __all__ = [
     "User",
     "UserPublic",
-    "UpdateUser",
-    "CreateUser",
+    "UserUpdate",
+    "UserCreate",
     "ChatSession",
     "ChatMessage",
-    "CreateChatSession",
-    "CreateChatMessage",
-    "UpdateChatSession",
+    "ChatSessionCreate",
+    "ChatMessageCreate",
+    "ChatSessionUpdate",
     "Class",
-    "CreateClass",
-    "UpdateClass",
+    "ClassCreate",
+    "ClassUpdate",
     "ClassStatus",
     "ClassRecord",
-    "CreateClassRecord",
-    "UpdateClassRecord",
+    "ClassRecordCreate",
+    "ClassRecordUpdate",
 ]

@@ -3,10 +3,27 @@ from typing import Optional
 from sqlmodel import Field, Integer
 from sqlalchemy import Index
 
-from ...common.define import MyBaseModel, Role, ClassRecordStatus, DTOBaseModel
+from ...common.define import MyBaseModel, Role, ClassRecordStatus
+from ...common.define import CreateBaseModel, UpdateBaseModel
 
 
-class BaseClassRecord(MyBaseModel):
+# dto
+class ClassRecordUpdate(UpdateBaseModel):
+    status: Optional[ClassRecordStatus] = Field(default=None)
+    uid: Optional[str] = Field(default=None)
+    role: Optional[Role] = Field(default=None)
+    class_id: Optional[int] = Field(default=None)
+
+
+class ClassRecordCreate(CreateBaseModel):
+    uid: str = Field(..., min_length=10, max_length=10, description="uid")
+    role: Role = Field(...)
+    class_id: int = Field(...)
+    status: ClassRecordStatus = ClassRecordStatus.OK
+
+
+# define
+class BaseClassRecord(MyBaseModel[ClassRecordCreate, ClassRecordUpdate]):
     status: ClassRecordStatus = Field(
         sa_type=Integer,
         default=ClassRecordStatus.OK,
@@ -30,18 +47,3 @@ class ClassRecord(BaseClassRecord, table=True):
         Index("class_record_class_id_index", "class_id"),
         Index("class_record_created_by_index", "created_by"),
     )
-
-
-# dto
-class UpdateClassRecord(DTOBaseModel):
-    status: Optional[ClassRecordStatus] = Field(default=None)
-    uid: Optional[str] = Field(default=None)
-    role: Optional[Role] = Field(default=None)
-    class_id: Optional[int] = Field(default=None)
-
-
-class CreateClassRecord(DTOBaseModel):
-    uid: str = Field(..., min_length=10, max_length=10, description="uid")
-    role: Role = Field(...)
-    class_id: int = Field(...)
-    status: ClassRecordStatus = ClassRecordStatus.OK

@@ -1,5 +1,5 @@
 from enum import IntEnum, StrEnum
-from typing import Optional
+from typing import Optional, Self, TypeVar, Generic
 
 from sqlmodel import Field, SQLModel
 
@@ -52,8 +52,21 @@ class ChatRole(StrEnum):
     user = "user"
 
 
-class MyBaseModel(SQLModel):
-    id: int = Field(default=None, primary_key=True)
+class CreateBaseModel(SQLModel):
+    created_by: Optional[str] = Field(default=None, description="creator's uid")
+    edited_by: Optional[str] = Field(default=None, description="editor's uid")
+
+
+class UpdateBaseModel(SQLModel):
+    edited_by: Optional[str] = Field(default=None, description="editor's uid")
+
+
+CreateDTO = TypeVar("CreateDTO", bound=CreateBaseModel)
+UpdateDTO = TypeVar("UpdateDTO", bound=UpdateBaseModel)
+
+
+class MyBaseModel(SQLModel, Generic[CreateDTO, UpdateDTO]):
+    id: Optional[int] = Field(default=None, primary_key=True)
 
     created_at: int = Field(default_factory=_now)
     edited_at: int = Field(default_factory=_now, sa_column_kwargs={"onupdate": _now})
@@ -61,7 +74,10 @@ class MyBaseModel(SQLModel):
     created_by: Optional[str] = Field(default=None, description="creator's uid")
     edited_by: Optional[str] = Field(default=None, description="editor's uid")
 
+    @classmethod
+    def from_create(cls, dto: CreateDTO) -> Self:
+        return cls.model_validate(dto)
 
-class DTOBaseModel(SQLModel):
-    created_by: Optional[str] = Field(default=None, description="creator's uid")
-    edited_by: Optional[str] = Field(default=None, description="editor's uid")
+    def apply_update(self, dto: UpdateDTO) -> Self:
+        self.sqlmodel_update(dto.model_dump(exclude_none=True, exclude_unset=True))
+        return self

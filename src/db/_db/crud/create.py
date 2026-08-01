@@ -3,47 +3,47 @@ from typing import Optional
 from sqlmodel import Session
 
 from ..engine import write_session
-from ..model import User, CreateUser
-from ..model import Class, CreateClass
-from ..model import ClassRecord, CreateClassRecord
-from ..model import ChatSession, CreateChatSession, ChatMessage, CreateChatMessage
+from ..model import User, UserCreate
+from ..model import Class, ClassCreate
+from ..model import ClassRecord, ClassRecordCreate
+from ..model import ChatSession, ChatSessionCreate, ChatMessage, ChatMessageCreate
 
 
 def create_user(
-    data: CreateUser,
+    data: UserCreate,
     ss: Optional[Session] = None,
 ) -> None:
     with write_session(ss) as session:
-        session.add(User(**data.model_dump()))
+        session.add(User.from_create(data))
 
 
 def create_class(
-    data: CreateClass,
+    data: ClassCreate,
     ss: Optional[Session] = None,
 ) -> None:
     with write_session(ss) as session:
-        session.add(Class(**data.model_dump()))
+        session.add(Class.from_create(data))
 
 
 def create_class_record(
-    data: CreateClassRecord,
+    data: ClassRecordCreate,
     ss: Optional[Session] = None,
 ) -> None:
     with write_session(ss) as session:
-        session.add(ClassRecord(**data.model_dump()))
+        session.add(ClassRecord.from_create(data))
 
 
 def create_chat_session(
-    data: CreateChatSession,
+    data: ChatSessionCreate,
     ss: Optional[Session] = None,
 ) -> None:
     with write_session(ss) as session:
-        session.add(ChatSession(**data.model_dump()))
+        session.add(ChatSession.from_create(data))
 
 
 def create_chat_message(
-    data: CreateChatMessage,
+    data: ChatMessageCreate,
     ss: Optional[Session] = None,
 ) -> None:
     with write_session(ss) as session:
-        session.add(ChatMessage(**data.model_dump()))
+        session.add(ChatMessage.from_create(data))
