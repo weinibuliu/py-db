@@ -9,7 +9,7 @@ from .crud.read import (
     get_class,
     get_class_record,
     get_class_by_id,
-    get_user_by_id,
+    get_user_by_pk,
     get_user_by_uid,
 )
 from .crud.create import create_user, create_class, create_class_record
@@ -39,7 +39,7 @@ __all__ = [
     "get_user",
     "get_class",
     "get_class_by_id",
-    "get_user_by_id",
+    "get_user_by_pk",
     "get_user_by_uid",
     "get_class_record",
     "create_user",

@@ -11,8 +11,15 @@ from ..model import ChatSession
 from ..model import ChatMessage
 from ...common.define import UserStatus, ClassRecordStatus, Role
 
+"""
+NOTE:
+    对于存在业务主键的查询:
+    id 指的是业务主键而非 pk 即 get_*_by_id = get_*_by_*_id
+    如果需要使用 pk 查询，请使用 get_*_by_pk 函数
+"""
 
-def get_user_by_id(id: str, ss: Optional[Session] = None) -> Optional[User]:
+
+def get_user_by_pk(id: str, ss: Optional[Session] = None) -> Optional[User]:
     with db.session() if ss is None else nullcontext(ss) as session:
         stat = select(User).where(User.id == id)
         return session.exec(stat).first()
@@ -118,7 +125,7 @@ def get_class_record(
         return list(session.exec(stat).all())
 
 
-def get_chat_session_by_session_id(
+def get_chat_session_by_id(
     session_id: str,
     ss: Optional[Session] = None,
 ) -> Optional[ChatSession]:
@@ -127,12 +134,30 @@ def get_chat_session_by_session_id(
         return session.exec(stat).first()
 
 
-def get_chat_message_by_message_id(
+def get_chat_session_by_pk(
+    id: str,
+    ss: Optional[Session] = None,
+) -> Optional[ChatSession]:
+    with db.session() if ss is None else nullcontext(ss) as session:
+        stat = select(ChatSession).where(ChatSession.id == id)
+        return session.exec(stat).first()
+
+
+def get_chat_message_by_id(
     message_id: str,
     ss: Optional[Session] = None,
 ) -> Optional[ChatMessage]:
     with db.session() if ss is None else nullcontext(ss) as session:
         stat = select(ChatMessage).where(ChatMessage.message_id == message_id)
+        return session.exec(stat).first()
+
+
+def get_chat_message_by_pk(
+    id: str,
+    ss: Optional[Session] = None,
+) -> Optional[ChatMessage]:
+    with db.session() if ss is None else nullcontext(ss) as session:
+        stat = select(ChatMessage).where(ChatMessage.id == id)
         return session.exec(stat).first()
 
 
