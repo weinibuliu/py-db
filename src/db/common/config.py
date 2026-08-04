@@ -1,3 +1,4 @@
+import urllib.parse
 from pathlib import Path
 from typing import Optional
 
@@ -19,7 +20,7 @@ class DBConfig(BaseSettings):
 
     @property
     def url(self) -> str:
-        return f"mysql+pymysql://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+        return f"mysql+pymysql://{self.user}:{urllib.parse.quote_plus(self.password)}@{self.host}:{self.port}/{self.name}"
 
     model_config = {
         "env_prefix": "DB_",
