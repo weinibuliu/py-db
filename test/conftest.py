@@ -20,7 +20,7 @@ TEST_ENV_PATH = Path.cwd() / "test.env"
 
 def _required_test_value(values: dict[str, str | None], key: str) -> str:
     value = values.get(key)
-    if not value:
+    if value is None:
         raise RuntimeError(f"{key} in test.env must not be empty")
     return value
 
@@ -34,7 +34,7 @@ def _db_test_config() -> DBConfig:
     port_value = _required_test_value(values, "DB_PORT")
     name = _required_test_value(values, "DB_NAME")
     user = _required_test_value(values, "DB_USER")
-    password = _required_test_value(values, "DB_PASSWORD")
+    password = values.get("DB_PASSWORD")
 
     try:
         port = int(port_value)
@@ -46,7 +46,7 @@ def _db_test_config() -> DBConfig:
         port=port,
         name=name,
         user=user,
-        password=password,
+        password=password,  # type: ignore
     )
 
 
