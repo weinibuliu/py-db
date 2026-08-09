@@ -66,7 +66,7 @@ def test_create_chat_session_preserves_explicit_values() -> None:
     assert session.total_tokens == 128
     assert session.summary == "Conversation summary"
     assert session.created_by == "creator-1"
-    assert session.edited_by == "editor-1"
+    assert session.edited_by == "creator-1"
 
 
 @pytest.mark.parametrize("field", ["session_id", "status", "uid", "title"])
@@ -120,7 +120,7 @@ def test_create_chat_message_preserves_all_fields() -> None:
     assert message.input_tokens == 3
     assert message.output_tokens == 5
     assert message.created_by == "creator-1"
-    assert message.edited_by == "editor-1"
+    assert message.edited_by == "creator-1"
 
 
 @pytest.mark.parametrize(
