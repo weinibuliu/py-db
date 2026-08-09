@@ -24,6 +24,7 @@ class UserUpdate(UpdateBaseModel):
 class UserCreate(CreateBaseModel):
     uid: str = Field(..., min_length=10, max_length=10, description="uid")
     password: str = Field(..., description="encrypt password")
+    status: UserStatus = Field(default=UserStatus.OK)
     name: str = Field(..., min_length=2, description="name")
     role: Role = Field(default=Role.Student)
     gender: Gender = Field(...)
