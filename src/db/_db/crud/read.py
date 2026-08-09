@@ -16,6 +16,9 @@ NOTE:
     对于存在业务主键的查询:
     id 指的是业务主键而非 pk 即 get_*_by_id = get_*_by_*_id
     如果需要使用 pk 查询，请使用 get_*_by_pk 函数
+
+    对于依赖业务主键的查询，会强制返回状态为 OK(0) 的项
+    如有需要，请使用 get_* 函数进行查询
 """
 
 
@@ -25,26 +28,32 @@ def get_user_by_pk(id: str, ss: Optional[Session] = None) -> Optional[User]:
         return session.exec(stat).first()
 
 
-def get_user_by_uid(uid: str, ss: Optional[Session] = None) -> Optional[User]:
+def get_user_by_uid(
+    uid: str,
+    ss: Optional[Session] = None,
+) -> Optional[User]:
     with db.session() if ss is None else nullcontext(ss) as session:
-        stat = select(User).where(User.uid == uid)
+        stat = select(User).where(User.uid == uid, User.status == UserStatus.OK)
         return session.exec(stat).first()
 
 
 def get_user(
     *,
+    uid: Optional[str] = None,
     name: Optional[str] = None,
     role: Optional[Role] = None,
     status: UserStatus = UserStatus.OK,
     ss: Optional[Session] = None,
 ) -> list[User]:
     """
-    NOTE: `name` `role` 为 None 代表不参与查询
+    NOTE: `uid` `name` `role` 为 None 代表不参与查询
     """
 
     with db.session() if ss is None else nullcontext(ss) as session:
         conditions: list[bool] = []
 
+        if uid is not None:
+            conditions.append(User.uid == uid)
         if name is not None:
             conditions.append(User.name == name)
         if role is not None:
@@ -56,14 +65,18 @@ def get_user(
         return list(session.exec(stat).all())
 
 
-def get_class_by_id(id: int, ss: Optional[Session] = None) -> Optional[Class]:
+def get_class_by_id(
+    id: int,
+    ss: Optional[Session] = None,
+) -> Optional[Class]:
     with db.session() if ss is None else nullcontext(ss) as session:
-        stat = select(Class).where(Class.id == id)
+        stat = select(Class).where(Class.id == id, Class.status == ClassStatus.OK)
         return session.exec(stat).first()
 
 
 def get_class(
     *,
+    id: Optional[int] = None,
     name: Optional[str] = None,
     course: Optional[str] = None,
     status: ClassStatus = ClassStatus.OK,
@@ -71,12 +84,14 @@ def get_class(
     ss: Optional[Session] = None,
 ) -> list[Class]:
     """
-    NOTE: `name` `course` 为 None 代表不参与查询
+    NOTE: `id` `name` `course` 为 None 代表不参与查询
     """
 
     with db.session() if ss is None else nullcontext(ss) as session:
         conditions: list[bool] = []
 
+        if id is not None:
+            conditions.append(Class.id == id)
         if name is not None:
             conditions.append(Class.name == name)
         if course is not None:
@@ -89,11 +104,23 @@ def get_class(
         return list(session.exec(stat).all())
 
 
+def get_class_record_by_pk(
+    id: int,
+    ss: Optional[Session] = None,
+) -> Optional[ClassRecord]:
+    with db.session() if ss is None else nullcontext(ss) as session:
+        stat = select(ClassRecord).where(ClassRecord.id == id)
+        return session.exec(stat).first()
+
+
 def get_class_record_by_uid(
     uid: str, ss: Optional[Session] = None
 ) -> list[ClassRecord]:
     with db.session() if ss is None else nullcontext(ss) as session:
-        stat = select(ClassRecord).where(ClassRecord.uid == uid)
+        stat = select(ClassRecord).where(
+            ClassRecord.uid == uid,
+            ClassRecord.status == ClassRecordStatus.OK,
+        )
         return list(session.exec(stat).all())
 
 

@@ -357,7 +357,7 @@ class TestUpdateUser:
         )
         assert result is None
 
-        user = get_user_by_uid(uid="upd0030000")
+        user = get_user(uid="upd0030000", status=UserStatus.Banned)[0]
         assert user is not None
         assert user.status == UserStatus.Banned
 
@@ -468,7 +468,7 @@ class TestUpdateClass:
         )
         assert result is None
 
-        cls = get_class_by_id(id=1)
+        cls = get_class(id=1, status=ClassStatus.Ended, private=True)[0]
         assert cls is not None
         assert cls.status == ClassStatus.Ended
         assert cls.private == True

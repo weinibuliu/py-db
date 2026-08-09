@@ -19,7 +19,7 @@ class ClassRecordCreate(CreateBaseModel):
     uid: str = Field(..., min_length=10, max_length=10, description="uid")
     role: Role = Field(...)
     class_id: int = Field(...)
-    status: ClassRecordStatus = ClassRecordStatus.OK
+    status: ClassRecordStatus = Field(default=ClassRecordStatus.OK)
 
 
 # define
