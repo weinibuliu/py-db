@@ -1,6 +1,7 @@
 from enum import IntEnum, StrEnum
 from typing import Optional, Self, TypeVar, Generic
 
+from pydantic import model_validator
 from sqlmodel import Field, SQLModel
 
 from .utils import _now
@@ -55,6 +56,11 @@ class ChatRole(StrEnum):
 class CreateBaseModel(SQLModel):
     created_by: Optional[str] = Field(default=None, description="creator's uid")
     edited_by: Optional[str] = Field(default=None, description="editor's uid")
+
+    @model_validator(mode="after")
+    def set_editor(self) -> Self:
+        self.edited_by = self.created_by
+        return self
 
 
 class UpdateBaseModel(SQLModel):
