@@ -1,5 +1,8 @@
 # Sync Cache
 
+> [!NOTE]
+> Sync 策略没有集成在 py-db 中 应当有由下游处理
+
 db 侧发生 CREATE/UPDATE 时，同步更新 Redis 侧缓存
 
 当下游需要查表时，首先从 redis 侧读取缓存，如果 redis 未能返回数据，自动 fallback 到数据库查询，然后将新值回写到 redis 中。

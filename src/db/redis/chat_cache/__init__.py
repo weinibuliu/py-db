@@ -1,4 +1,4 @@
-from .core import *
+from ..cache._chat import *
 from .model import MessageCache
 
 __all__ = [

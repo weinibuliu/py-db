@@ -1,5 +1,5 @@
 from ..client import RedisClient
-from .define import Prefix, SESSION_CACHE_TTL, SESSION_CACHE_LIST_LIMIT
+from .define import Prefix, SESSION_CACHE_TTL
 from .model import MessageCache
 
 
