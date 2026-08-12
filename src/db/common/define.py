@@ -1,5 +1,5 @@
 from enum import IntEnum, StrEnum
-from typing import Optional, Self, TypeVar, Generic
+from typing import Optional, Self, TypeVar, Generic, Literal
 
 from pydantic import model_validator
 from sqlmodel import Field, SQLModel
@@ -46,11 +46,14 @@ class ChatSessionStatus(IntEnum):
     Deleted = 100
 
 
-# TODO: 如果 pydantic 未正确处理 StrEnum 则换用 Literal
-class ChatRole(StrEnum):
-    system = "system"
-    assistant = "assistant"
-    user = "user"
+ChatRole = Literal["system", "assistant", "user", "tool"]
+
+
+class ChatMessageStatus(IntEnum):
+    OK = 0
+    Interrupted = 1  # 中断 不应使用 仅作审计
+
+    Deleted = 100
 
 
 class CreateBaseModel(SQLModel):

@@ -75,3 +75,6 @@ def update_chat_session(
             raise NotFoundError()
 
         entity.apply_update(data)
+
+
+# NOTE: 不提供 update_chat_message

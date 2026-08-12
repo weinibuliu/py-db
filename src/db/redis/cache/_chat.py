@@ -11,7 +11,7 @@ async def push_message(session_id: str, msg: MessageCache):
         pipe.expire(key, SESSION_CACHE_TTL)
 
 
-async def get_session_cache(session_id: str) -> list[MessageCache]:
+async def get_messages(session_id: str) -> list[MessageCache]:
     key = Prefix.session(session_id)
 
     async with RedisClient.pipeline(auto_execute=False) as pipe:

@@ -9,7 +9,13 @@ from ..model import Class, ClassStatus
 from ..model import ClassRecord
 from ..model import ChatSession
 from ..model import ChatMessage
-from ...common.define import UserStatus, ClassRecordStatus, Role
+from ...common.define import (
+    UserStatus,
+    ClassRecordStatus,
+    Role,
+    ChatMessageStatus,
+    ChatSessionStatus,
+)
 
 """
 NOTE:
@@ -170,6 +176,18 @@ def get_chat_session_by_pk(
         return session.exec(stat).first()
 
 
+def get_chat_session_by_uid(
+    uid: str,
+    ss: Optional[Session] = None,
+) -> list[ChatSession]:
+    with db.session() if ss is None else nullcontext(ss) as session:
+        stat = select(ChatSession).where(
+            ChatSession.uid == uid,
+            ChatSession.status == ChatSessionStatus.OK,
+        )
+        return list(session.exec(stat).all())
+
+
 def get_chat_message_by_id(
     message_id: str,
     ss: Optional[Session] = None,
@@ -193,5 +211,8 @@ def get_chat_messages_by_session(
     ss: Optional[Session] = None,
 ) -> list[ChatMessage]:
     with db.session() if ss is None else nullcontext(ss) as session:
-        stat = select(ChatMessage).where(ChatMessage.session_id == session_id)
+        stat = select(ChatMessage).where(
+            ChatMessage.session_id == session_id,
+            ChatMessage.status == ChatMessageStatus.OK,
+        )
         return list(session.exec(stat).all())

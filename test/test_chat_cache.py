@@ -4,9 +4,8 @@ import pytest
 
 from db.common.define import ChatRole
 from db.redis import chat_cache
-from db.redis.chat_cache.define import Prefix, SESSION_CACHE_TTL
+from db.redis.cache.define import Prefix, SESSION_CACHE_TTL
 from db.redis.client import RedisClient
-
 
 pytestmark = pytest.mark.usefixtures("redis")
 
