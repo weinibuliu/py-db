@@ -28,22 +28,22 @@ def _message_data() -> dict[str, object]:
         "session_id": "session-1",
         "message_id": "message-1",
         "uid": "user-1",
-        "role": ChatRole.user,
+        "role": "user",
         "content": "Hello",
         "model": "test-model",
         "temperature": 1,
         "top_k": 40,
-        "input_tokens": 3,
+        "cached_tokens": 1,
+        "uncached_tokens": 2,
         "output_tokens": 5,
     }
 
 
-def test_create_chat_session_uses_counter_and_summary_defaults() -> None:
+def test_create_chat_session_uses_counter_defaults() -> None:
     session = ChatSessionCreate(**_session_data())
 
     assert session.message_count == 0
     assert session.total_tokens == 0
-    assert session.summary is None
     assert session.created_by is None
     assert session.edited_by is None
 
@@ -53,7 +53,6 @@ def test_create_chat_session_preserves_explicit_values() -> None:
         **_session_data(),
         message_count=4,
         total_tokens=128,
-        summary="Conversation summary",
         created_by="creator-1",
         edited_by="editor-1",
     )
@@ -64,7 +63,6 @@ def test_create_chat_session_preserves_explicit_values() -> None:
     assert session.title == "A chat session"
     assert session.message_count == 4
     assert session.total_tokens == 128
-    assert session.summary == "Conversation summary"
     assert session.created_by == "creator-1"
     assert session.edited_by == "creator-1"
 
@@ -92,7 +90,6 @@ def test_update_chat_session_supports_partial_updates() -> None:
     update = ChatSessionUpdate(
         status=ChatSessionStatus.Archived,
         title="Archived chat",
-        summary=None,
     )
 
     assert empty_update.model_dump(exclude_unset=True) == {}
@@ -117,7 +114,8 @@ def test_create_chat_message_preserves_all_fields() -> None:
     assert message.model == "test-model"
     assert message.temperature == 1
     assert message.top_k == 40
-    assert message.input_tokens == 3
+    assert message.cached_tokens == 1
+    assert message.uncached_tokens == 2
     assert message.output_tokens == 5
     assert message.created_by == "creator-1"
     assert message.edited_by == "creator-1"
@@ -134,7 +132,8 @@ def test_create_chat_message_preserves_all_fields() -> None:
         "model",
         "temperature",
         "top_k",
-        "input_tokens",
+        "cached_tokens",
+        "uncached_tokens",
         "output_tokens",
     ],
 )
