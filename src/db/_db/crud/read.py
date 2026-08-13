@@ -1,7 +1,7 @@
 from contextlib import nullcontext
 from typing import Optional
 
-from sqlmodel import Session, select
+from sqlmodel import Session, select, col
 
 from ..engine import DBEngine as db
 from ..model import User
@@ -163,7 +163,10 @@ def get_chat_session_by_id(
     ss: Optional[Session] = None,
 ) -> Optional[ChatSession]:
     with db.session() if ss is None else nullcontext(ss) as session:
-        stat = select(ChatSession).where(ChatSession.session_id == session_id)
+        stat = select(ChatSession).where(
+            ChatSession.session_id == session_id,
+            ChatSession.status == ChatSessionStatus.OK,
+        )
         return session.exec(stat).first()
 
 
@@ -181,10 +184,15 @@ def get_chat_session_by_uid(
     ss: Optional[Session] = None,
 ) -> list[ChatSession]:
     with db.session() if ss is None else nullcontext(ss) as session:
-        stat = select(ChatSession).where(
-            ChatSession.uid == uid,
-            ChatSession.status == ChatSessionStatus.OK,
+        stat = (
+            select(ChatSession)
+            .where(
+                ChatSession.uid == uid,
+                ChatSession.status == ChatSessionStatus.OK,
+            )
+            .order_by(col(ChatSession.created_at).desc())
         )
+
         return list(session.exec(stat).all())
 
 
@@ -193,7 +201,10 @@ def get_chat_message_by_id(
     ss: Optional[Session] = None,
 ) -> Optional[ChatMessage]:
     with db.session() if ss is None else nullcontext(ss) as session:
-        stat = select(ChatMessage).where(ChatMessage.message_id == message_id)
+        stat = select(ChatMessage).where(
+            ChatMessage.message_id == message_id,
+            ChatMessage.status == ChatMessageStatus.OK,
+        )
         return session.exec(stat).first()
 
 
@@ -211,8 +222,12 @@ def get_chat_messages_by_session(
     ss: Optional[Session] = None,
 ) -> list[ChatMessage]:
     with db.session() if ss is None else nullcontext(ss) as session:
-        stat = select(ChatMessage).where(
-            ChatMessage.session_id == session_id,
-            ChatMessage.status == ChatMessageStatus.OK,
+        stat = (
+            select(ChatMessage)
+            .where(
+                ChatMessage.session_id == session_id,
+                ChatMessage.status == ChatMessageStatus.OK,
+            )
+            .order_by((col(ChatMessage.id).asc()))
         )
         return list(session.exec(stat).all())

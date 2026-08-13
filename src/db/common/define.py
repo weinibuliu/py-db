@@ -46,7 +46,14 @@ class ChatSessionStatus(IntEnum):
     Deleted = 100
 
 
-ChatRole = Literal["system", "assistant", "user", "tool"]
+class ChatRole(StrEnum):
+    system = "system"
+    assistant = "assistant"
+    tool = "tool"
+    user = "user"
+
+
+ChatRoleLiteral = Literal["system", "assistant", "tool", "user"]
 
 
 class ChatMessageStatus(IntEnum):

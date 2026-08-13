@@ -44,8 +44,7 @@ class ChatSession(BaseChatSession, table=True):
     __tablename__ = "chat_session"  # type: ignore
     __table_args__ = (
         Index("chat_session_uid_index", "uid"),
-        # TODO: 建立时间戳降序索引
-        # Index("chat_session_uid_edited_at_index", "uid", "edited_at"),
+        Index("chat_session_id_uindex", "session_id", unique=True),
     )
 
 
@@ -75,8 +74,8 @@ class ChatMessageUpdate(UpdateBaseModel): ...
 
 class BaseChatMessage(MyBaseModel[ChatMessageCreate, ChatMessageUpdate]):
     # 使用自增主键进行排序
-    session_id: str = Field(...)
     message_id: str = Field(...)
+    session_id: str = Field(...)
     uid: str = Field(max_length=255, nullable=False)
     status: ChatMessageStatus = Field(default=ChatMessageStatus.OK)
 
@@ -99,4 +98,6 @@ class ChatMessage(BaseChatMessage, table=True):
     __table_args__ = (
         Index("chat_message_uid_index", "uid"),
         Index("chat_message_status_index", "status"),
+        Index("chat_message_session_id_uindex", "session_id"),
+        Index("chat_message_message_id_uindex", "message_id", unique=True),
     )

@@ -88,6 +88,10 @@ class RedisClient:
         return await cls.get_client().lpop(name, count)
 
     @classmethod
+    async def llen(cls, name: str) -> int:
+        return await cls.get_client().llen(name)
+
+    @classmethod
     @asynccontextmanager
     async def pipeline(cls, *, transaction: bool = True, auto_execute: bool = True):
         """自动调用 pipeline.execute()"""
