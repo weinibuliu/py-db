@@ -1,11 +1,10 @@
-from asyncio import to_thread
 from typing import Optional
 
 from .define import Prefix, SESSION_CACHE_TTL
 from .model import MessageCache
 from ..client import RedisClient
 from ...common import BackendError, NotFoundError
-from ..._db.crud.read import get_chat_messages_by_session
+from ..._db.crud.async_read import async_get_chat_messages_by_session
 from ..._db.model import ChatMessage
 
 
@@ -56,7 +55,7 @@ async def read_message_cache(session_id: str) -> list[MessageCache]:
     if msg is not None:
         return msg
 
-    data = await to_thread(get_chat_messages_by_session, session_id)
+    data = await async_get_chat_messages_by_session(session_id)
     if not data:
         raise NotFoundError
 

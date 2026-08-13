@@ -52,7 +52,14 @@ async def test_session_caches_are_isolated() -> None:
 
 @pytest.mark.asyncio
 async def test_missing_session_raises_not_found(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(chat, "get_chat_messages_by_session", lambda _: [])
+    async def read_database(_: str) -> list[MessageCache]:
+        return []
+
+    monkeypatch.setattr(
+        chat,
+        "async_get_chat_messages_by_session",
+        read_database,
+    )
 
     with pytest.raises(NotFoundError):
         await chat.read_message_cache("missing-session")
@@ -68,12 +75,16 @@ async def test_cache_miss_reads_database_and_populates_cache(
     ]
     database_reads = 0
 
-    def read_database(_: str) -> list[MessageCache]:
+    async def read_database(_: str) -> list[MessageCache]:
         nonlocal database_reads
         database_reads += 1
         return messages
 
-    monkeypatch.setattr(chat, "get_chat_messages_by_session", read_database)
+    monkeypatch.setattr(
+        chat,
+        "async_get_chat_messages_by_session",
+        read_database,
+    )
 
     assert await chat.read_message_cache("session-1") == messages
     assert await chat.read_message_cache("session-1") == messages
