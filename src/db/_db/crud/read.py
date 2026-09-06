@@ -196,18 +196,6 @@ def get_chat_session_by_uid(
         return list(session.exec(stat).all())
 
 
-def get_chat_message_by_id(
-    message_id: str,
-    ss: Optional[Session] = None,
-) -> Optional[ChatMessage]:
-    with db.session() if ss is None else nullcontext(ss) as session:
-        stat = select(ChatMessage).where(
-            ChatMessage.message_id == message_id,
-            ChatMessage.status == ChatMessageStatus.OK,
-        )
-        return session.exec(stat).first()
-
-
 def get_chat_message_by_pk(
     id: str,
     ss: Optional[Session] = None,

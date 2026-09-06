@@ -90,12 +90,6 @@ async def async_get_chat_session_by_uid(uid: str) -> list[ChatSession]:
     return await to_thread(read.get_chat_session_by_uid, uid)
 
 
-async def async_get_chat_message_by_id(
-    message_id: str,
-) -> Optional[ChatMessage]:
-    return await to_thread(read.get_chat_message_by_id, message_id)
-
-
 async def async_get_chat_message_by_pk(id: str) -> Optional[ChatMessage]:
     return await to_thread(read.get_chat_message_by_pk, id)
 

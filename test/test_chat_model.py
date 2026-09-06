@@ -11,7 +11,7 @@ from db._db.model._chat import (
     ChatSessionCreate,
     ChatSessionUpdate,
 )
-from db.common.define import ChatRole, ChatSessionStatus
+from db.common.define import ChatSessionStatus
 
 
 def _session_data() -> dict[str, object]:
