@@ -1,6 +1,6 @@
 from typing import Optional
 
-from .define import Prefix, SESSION_CACHE_TTL
+from .define import Prefix, SESSION_CACHE_TTL, SESSION_CACHE_LIST_LIMIT
 from .model import MessageCache
 from ..client import RedisClient
 from ...common import BackendError, NotFoundError
@@ -31,11 +31,14 @@ async def push_messages(session_id: str, msg_list: list[ChatMessage]) -> None:
         pipe.expire(key, SESSION_CACHE_TTL)
 
 
-async def _get_messages(session_id: str) -> Optional[list[MessageCache]]:
+async def _get_messages(
+    session_id: str,
+    limit: Optional[int] = SESSION_CACHE_LIST_LIMIT,
+) -> Optional[list[MessageCache]]:
     key = Prefix.session(session_id)
 
     async with RedisClient.pipeline(auto_execute=False) as pipe:
-        pipe.lrange(key, 0, -1)
+        pipe.lrange(key, 0, -1 if limit is None else limit)
         pipe.expire(key, SESSION_CACHE_TTL)
 
     result = await pipe.execute()
@@ -50,8 +53,11 @@ async def _get_messages(session_id: str) -> Optional[list[MessageCache]]:
     return [MessageCache.model_validate_json(i) for i in ans]
 
 
-async def read_message_cache(session_id: str) -> list[MessageCache]:
-    msg = await _get_messages(session_id)
+async def read_message_cache(
+    session_id: str,
+    limit: Optional[int] = SESSION_CACHE_LIST_LIMIT,
+) -> list[MessageCache]:
+    msg = await _get_messages(session_id, limit=limit)
     if msg is not None:
         return msg
 

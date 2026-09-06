@@ -1,4 +1,4 @@
-from enum import IntEnum, StrEnum
+from enum import IntEnum
 from typing import Optional, Self, TypeVar, Generic, Literal
 
 from pydantic import model_validator
@@ -44,16 +44,6 @@ class ChatSessionStatus(IntEnum):
     Archived = 1
 
     Deleted = 100
-
-
-class ChatRole(StrEnum):
-    system = "system"
-    assistant = "assistant"
-    tool = "tool"
-    user = "user"
-
-
-ChatRoleLiteral = Literal["system", "assistant", "tool", "user"]
 
 
 class ChatMessageStatus(IntEnum):

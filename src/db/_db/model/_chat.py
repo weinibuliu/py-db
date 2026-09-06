@@ -1,9 +1,10 @@
 from typing import Optional
 
+from pydantic import BaseModel
 from sqlmodel import Field, TEXT
 from sqlalchemy import Index
 
-from ...common.define import MyBaseModel, ChatRole, ChatSessionStatus, ChatMessageStatus
+from ...common.define import MyBaseModel, ChatSessionStatus, ChatMessageStatus
 from ...common.define import CreateBaseModel, UpdateBaseModel
 
 
@@ -12,18 +13,25 @@ class ChatSessionUpdate(UpdateBaseModel):
     status: Optional[ChatSessionStatus] = Field(default=None)
     title: Optional[str] = Field(default=None)
     message_count: Optional[int] = Field(default=None)
-    total_tokens: Optional[int] = Field(default=None)
+
+    input_cached_tokens: int = Field(default=0)
+    input_uncached_tokens: int = Field(default=0)
+    output_tokens: int = Field(default=0)
+
     # summary: Optional[str] = Field(default=None)
 
 
 class ChatSessionCreate(CreateBaseModel):
     session_id: str = Field(...)
-    status: ChatSessionStatus = Field(...)
+    status: ChatSessionStatus = Field(default=ChatSessionStatus.OK)
     uid: str = Field(..., max_length=255, nullable=False)
 
     title: str = Field(..., max_length=255)
     message_count: int = Field(default=0)
-    total_tokens: int = Field(default=0)
+
+    input_cached_tokens: int = Field(default=0)
+    input_uncached_tokens: int = Field(default=0)
+    output_tokens: int = Field(default=0)
 
     # summary: Optional[str] = Field(default=None, sa_type=TEXT)
 
@@ -35,7 +43,10 @@ class BaseChatSession(MyBaseModel[ChatSessionCreate, ChatSessionUpdate]):
 
     title: str = Field(..., max_length=255)
     message_count: int = Field(default=0)
-    total_tokens: int = Field(default=0)
+
+    input_cached_tokens: int = Field(default=0)
+    input_uncached_tokens: int = Field(default=0)
+    output_tokens: int = Field(default=0)
 
     summary: Optional[str] = Field(default=None, sa_type=TEXT)
 
@@ -51,22 +62,20 @@ class ChatSession(BaseChatSession, table=True):
 class ChatMessageCreate(CreateBaseModel):
     # 使用自增主键进行排序
     session_id: str = Field(...)
-    message_id: str = Field(...)
-    uid: str = Field(max_length=255)
     status: ChatMessageStatus = Field(default=ChatMessageStatus.OK)
 
-    role: ChatRole = Field(...)
+    role: str = Field(...)
     content: str = Field(..., sa_type=TEXT)
 
     # metadata
-    model: str = Field(...)
-    temperature: int = Field(...)
-    top_k: int = Field(...)
+    model: Optional[str] = Field(default=None)
+    temperature: Optional[int] = Field(default=None)
+    top_k: Optional[int] = Field(default=None)
 
     # 成本核算
-    cached_tokens: int = Field(...)
-    uncached_tokens: int = Field(...)
-    output_tokens: int = Field(...)
+    cached_tokens: int = Field(default=0)
+    uncached_tokens: int = Field(default=0)
+    output_tokens: int = Field(default=0)
 
 
 class ChatMessageUpdate(UpdateBaseModel): ...
@@ -74,12 +83,11 @@ class ChatMessageUpdate(UpdateBaseModel): ...
 
 class BaseChatMessage(MyBaseModel[ChatMessageCreate, ChatMessageUpdate]):
     # 使用自增主键进行排序
-    message_id: str = Field(...)
     session_id: str = Field(...)
     uid: str = Field(max_length=255, nullable=False)
     status: ChatMessageStatus = Field(default=ChatMessageStatus.OK)
 
-    role: ChatRole = Field(...)
+    role: str = Field(...)
     content: str = Field(..., sa_type=TEXT)
 
     # metadata
@@ -99,5 +107,4 @@ class ChatMessage(BaseChatMessage, table=True):
         Index("chat_message_uid_index", "uid"),
         Index("chat_message_status_index", "status"),
         Index("chat_message_session_id_uindex", "session_id"),
-        Index("chat_message_message_id_uindex", "message_id", unique=True),
     )

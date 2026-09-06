@@ -77,4 +77,23 @@ def update_chat_session(
         entity.apply_update(data)
 
 
+def update_chat_session_usage(
+    session_id: str,
+    input_cache: int,
+    input_not_cache: int,
+    output: int,
+    ss: Optional[Session] = None,
+):
+    with write_session(ss) as session:
+        stat = select(ChatSession).where(ChatSession.session_id == session_id)
+
+        entity: Optional[ChatSession] = session.exec(stat).first()
+        if entity is None:
+            raise NotFoundError()
+
+        entity.input_cached_tokens += input_cache
+        entity.input_uncached_tokens += input_not_cache
+        entity.output_tokens += output
+
+
 # NOTE: 不提供 update_chat_message

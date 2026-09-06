@@ -3,6 +3,13 @@ from .model import User, Class, ClassRecord, UserCreate, ClassCreate, ClassRecor
 from .model import UserUpdate, ClassUpdate, ClassRecordUpdate
 from .model import User, Class, ClassRecord
 from .model import UserPublic
+from .model import (
+    ChatSessionCreate,
+    ChatSessionUpdate,
+    ChatMessageCreate,
+    ChatMessage,
+    ChatSession,
+)
 
 from .crud.read import (
     get_user,
@@ -11,6 +18,8 @@ from .crud.read import (
     get_class_by_id,
     get_user_by_pk,
     get_user_by_uid,
+    get_chat_session_by_id,
+    get_chat_session_by_uid,
 )
 from .crud.async_read import (
     async_get_user,
@@ -33,8 +42,20 @@ from .crud.async_update import (
     async_update_class_record,
     async_update_chat_session,
 )
-from .crud.create import create_user, create_class, create_class_record
-from .crud.update import update_user, update_class, update_class_record
+from .crud.create import (
+    create_user,
+    create_class,
+    create_class_record,
+    create_chat_session,
+    create_chat_message,
+)
+from .crud.update import (
+    update_user,
+    update_class,
+    update_class_record,
+    update_chat_session,
+    update_chat_session_usage,
+)
 
 from ..common.define import Role, Gender, UserStatus, ClassStatus, ClassRecordStatus
 
@@ -63,6 +84,8 @@ __all__ = [
     "get_user_by_pk",
     "get_user_by_uid",
     "get_class_record",
+    "get_chat_session_by_id",
+    "get_chat_session_by_uid",
     "async_get_user",
     "async_get_class",
     "async_get_class_by_id",
@@ -81,11 +104,20 @@ __all__ = [
     "create_user",
     "create_class",
     "create_class_record",
+    "create_chat_session",
+    "create_chat_message",
     "update_user",
     "update_class",
     "update_class_record",
+    "update_chat_session",
+    "update_chat_session_usage",
     # "BaseUser",
     # "BaseClass",
     # "BaseClassRecord",
     "UserPublic",
+    "ChatSessionCreate",
+    "ChatSessionUpdate",
+    "ChatMessageCreate",
+    "ChatMessage",
+    "ChatSession",
 ]

@@ -1,5 +1,3 @@
-from ...common.define import ChatRole
-
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -30,5 +28,5 @@ class UserProfileCache(BaseModel):
 
 
 class MessageCache(BaseModel):
-    role: ChatRole = Field(...)
+    role: str = Field(...)
     content: str = Field(...)
